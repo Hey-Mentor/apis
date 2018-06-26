@@ -1,3 +1,14 @@
+# Hey Mentor API Surface 
+
+## Overview 
+
+The project contains the API surface that supports the following Hey Mentor projects. See the API Surface section below for more details.  
+
+1. Hey Mentor Mobile Application 
+
+2. Hey Mentor Admin Experience 
+
+
 ## Requirements 
 
 1. __Node.js and NPM__
@@ -28,3 +39,10 @@ The backend datastore contains mentees with the following matched mentor IDs:
 * elksvneks
 
 * none
+
+# API Surface 
+
+## Mobile App API Surface 
+
+Endpoint: `/mentees/<mentorId>`
+Response: Mentee details, or Error    

@@ -3,7 +3,6 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
-
 var MenteeSchema = new Schema({
   name: {
     type: String,
