@@ -11,7 +11,7 @@ mongoose.Promise = global.Promise;
 
 //var connectionString = require('./local');
 var connectionString = process.env.CONNECTION_STRING;
-mongoose.connect(connectionString()); 
+mongoose.connect(connectionString); 
 
 // Handle the connection event
 var db = mongoose.connection;
