@@ -9,7 +9,8 @@ var express = require('express'),
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;
 
-var connectionString = require('./local');
+//var connectionString = require('./local');
+var connectionString = process.env.CONNECTION_STRING;
 mongoose.connect(connectionString()); 
 
 // Handle the connection event
