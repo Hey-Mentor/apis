@@ -44,5 +44,15 @@ The backend datastore contains mentees with the following matched mentor IDs:
 
 ## Mobile App API Surface 
 
-Endpoint: `/mentees/<mentorId>`
+__Endpoint__: `/mentees/<menteeId>`
+
+Gets the mentee for the given mentee ID
+
 Response: Mentee details, or Error    
+
+
+__Endpoint__: `/mentors/<mentorId>`
+
+Gets the mentor for the given mentor ID 
+
+Response: Mentor details, or Error    
