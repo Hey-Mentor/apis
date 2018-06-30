@@ -16,7 +16,7 @@ var mongoose = require('mongoose'),
 *
 */
 exports.list_all_mentees = function(req, res) {
-  Mentees.find({ mentor_id: req.params.mentorId }, function(err, mentee) {
+  Mentees.find({ mentee_id: req.params.mentorId }, function(err, mentee) {
     if (err)
       res.send(err);
     res.json(mentee);

@@ -10,6 +10,8 @@ var express = require('express'),
 mongoose.Promise = global.Promise;
 
 //var connectionString = require('./local');
+//mongoose.connect(connectionString()); 
+
 var connectionString = process.env.CONNECTION_STRING;
 mongoose.connect(connectionString); 
 
