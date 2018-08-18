@@ -3,12 +3,26 @@
 module.exports = function(app) {
   var mentorController = require('../controllers/mentorController');
 
-  app.route('/mentors/:facebookId')
+// --------------------------------------------------------
+//
+// TODO: Only deploy "unsecure" versions in PPE, and not PROD 
+//
+  app.route('/unsecure/mentors/:facebookId')
+    .get(mentorController.get_a_mentor_unsecure);
+
+  app.route('/unsecure/mentees/:mentorId')
+    .get(mentorController.list_all_mentees_unsecure);
+
+  app.route('/unsecure/notifications/:userId')
+    .get(mentorController.get_notifications_unsecure);
+// --------------------------------------------------------
+
+  app.route('/mentors/:facebookId/:token')
     .get(mentorController.get_a_mentor);
 
-  app.route('/mentees/:mentorId')
+  app.route('/mentees/:mentorId/:token')
     .get(mentorController.list_all_mentees);
 
-  app.route('/notifications/:userId')
+  app.route('/notifications/:userId/:token')
     .get(mentorController.get_notifications);
 };
