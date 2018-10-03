@@ -14,9 +14,21 @@ var validate_token = function(token) {
     }
 
     var fbTokenValidationRequest = `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`
+    var googleTokenValidationRequest = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`
     const axios = require('axios');
 
-    var responseData = axios.get(fbTokenValidationRequest)
+    var fbToken = false;
+
+    var responseDataFb = axios.get(fbTokenValidationRequest)
+      .then(response => {
+        fbToken = true;
+        return response.data;
+      })
+      .catch(error => {
+        console.log(error);
+      });
+
+    var responseDataGoogle = axios.get(googleTokenValidationRequest)
       .then(response => {
         return response.data;
       })
@@ -24,18 +36,35 @@ var validate_token = function(token) {
         console.log(error);
       });
 
-    return responseData.then(data => {
-        console.log("Data");
-        console.log(data);
+    if (fbToken) {
 
-        if (!data || !data['data']){
+      return responseDataFb.then(data => {
+          console.log("Data");
+
+          if (!data || !data['data']){
+            return false;
+          }
+
+          var appId = data['data']['app_id'];
+          var isValid = data['data']['is_valid'];
+          var correctApp = appId == '1650628351692070';
+          return correctApp && isValid;
+      }).catch(error => {
+          console.log(error);
+          return false;
+      });;
+    }
+
+    return responseDataGoogle.then(data => {
+        console.log("Data");
+
+        if (!data){
           return false;
         }
 
-        var appId = data['data']['app_id'];
-        var isValid = data['data']['is_valid'];
-        var correctApp = appId == '1650628351692070';
-        return correctApp && isValid;
+        var appId = data['aud'];
+        var correctApp = appId == '12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleusercontent.com';
+        return correctApp;
     }).catch(error => {
         console.log(error);
         return false;
@@ -79,7 +108,7 @@ exports.list_all_mentees = function(req, res) {
 exports.get_a_mentor = function(req, res) {
   validate_token(req.params.token).then( valid => {
     if( valid ){
-      Mentors.find({facebook_id: req.params.facebookId}, function(err, mentor){
+      Mentors.find({auth_id: req.params.userId}, function(err, mentor){
         if (err)
           res.send(err);
         res.json(mentor);
@@ -120,7 +149,7 @@ exports.list_all_mentees_unsecure = function(req, res) {
 };
 
 exports.get_a_mentor_unsecure = function(req, res) {
-  Mentors.find({facebook_id: req.params.facebookId}, function(err, mentor){
+  Mentors.find({auth_id: req.params.userId}, function(err, mentor){
     if (err)
       res.send(err);
     res.json(mentor);

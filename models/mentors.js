@@ -7,7 +7,7 @@ var MentorSchema = new Schema({
   mentor_id: {
     type: String
   },
-  facebook_id: { type: String },
+  auth_id: { type: String},
   mentee_ids: { type:[{type:String}]}
 },
 {
