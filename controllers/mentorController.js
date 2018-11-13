@@ -5,37 +5,117 @@ var mongoose = require('mongoose'),
   Mentors = mongoose.model('Mentors');
   //Logins = mongoose.model('Logins'),
   //Notifications = mongoose.model('Notifications');
+mongoose.set('debug', true);
+
+var supportedAuthTypes = ["facebook", "google"];
+const FACEBOOK_APP_ID = "1650628351692070";
+const GOOGLE_APP_ID = "12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleusercontent.com";
 
 
-var validate_token = function(token) {
+exports.get_id_token = function(req, res) {
+  validate_token(req.params.fedToken, req.params.authType).then( valid_user => {
+    if( valid_user ){
+      Mentees.find( { $or:[ {'facebook_id': valid_user}, {'google_id': valid_user} ]}, function(err, mentee) {
+        if (err)
+          res.send(err);
+        
+        var id_token = { "fedToken": req.params.fedToken, "user_id": mentee.mentee_id, "user_type": "mentee", "authType": req.params.authType };
+        res.json(id_token);
+      });
+
+      Mentors.find({ $or:[ {'facebook_id': valid_user}, {'google_id': valid_user} ]}, function(err, mentor) {
+        if (err)
+          res.send(err);
+
+        var id_token = { "fedToken": req.params.fedToken, "user_id": mentor.mentor_id, "user_type": "mentor", "authType": req.params.authType };
+        res.json(mentor);
+      });
+    }else{
+      console.log("Invalid token presented to get_id_token");
+      res.send("You must make a request with a valid access token");  
+    }
+  });
+
+};
+
+
+var validate_token = function(token, authType) {
     console.log("Validating token");
-    if (!token){
+    
+    if (!token || !authType){
         return false;
     }
 
-    var fbTokenValidationRequest = `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`
+    if (!(authType in supportedAuthTypes)){
+      console.log("Invalid auth type");
+      return false;
+    }
+
+    var fbTokenValidationRequest = `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`;
+    var googleTokenValidationRequest = `https://www.googleapis.com/oauth2/v3/tokeninfo?id_token=${token}`;
     const axios = require('axios');
 
-    var responseData = axios.get(fbTokenValidationRequest)
-      .then(response => {
-        return response.data;
-      })
-      .catch(error => {
-        console.log(error);
-      });
+    var responseData;
+
+    switch (authType) {
+      case "facebook":
+          responseData = axios.get(fbTokenValidationRequest)
+            .then(response => {
+              return response.data;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+
+          break;
+      case "google":
+        responseData = axios.get(googleTokenValidationRequest)
+          .then(response => {
+            return response.data;
+          })
+          .catch(error => {
+            console.log(error);
+          });
+
+
+          break;
+    }
 
     return responseData.then(data => {
         console.log("Data");
         console.log(data);
 
-        if (!data || !data['data']){
-          return false;
-        }
+        switch (authType) {
+          case "facebook":
+            if (!data || !data['data']){
+              return false;
+            }
+            
+            var appId = data['data']['app_id'];
+            var isValid = data['data']['is_valid'];
+            var correctApp = appId == FACEBOOK_APP_ID;
+            if (correctApp && isValid){
+              return data['data']['user_id'];
+            }else{
+              return false;
+            }
 
-        var appId = data['data']['app_id'];
-        var isValid = data['data']['is_valid'];
-        var correctApp = appId == '1650628351692070';
-        return correctApp && isValid;
+            break;
+          case "google":
+            if (!data){
+              return false;
+            }
+
+            var appId = data['aud'];
+            var correctApp = appId == GOOGLE_APP_ID;
+            if (correctApp){
+              return data['user_id'];
+            }else{
+              return false;
+            }
+
+            break;
+        }
     }).catch(error => {
         console.log(error);
         return false;
@@ -112,9 +192,20 @@ exports.get_notifications = function(req, res) {
 // UNSECURE APIS
 //
 exports.list_all_mentees_unsecure = function(req, res) {
-  Mentees.find({ mentee_id: req.params.mentorId }, function(err, mentee) {
+  Mentors.find({ mentor_id: req.params.mentorId }, function(err, mentee) {
     if (err)
       res.send(err);
+    res.json(mentee);
+  });
+};
+
+exports.get_a_mentee_unsecure = function(req, res) {
+  console.log("Trying to get a mentee");
+  console.log(req.params.menteeId);
+  Mentees.find({ mentee_id: req.params.menteeId }, function(err, mentee) {
+    if (err)
+      res.send(err);
+    console.log(mentee);
     res.json(mentee);
   });
 };

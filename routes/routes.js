@@ -7,7 +7,7 @@ module.exports = function(app) {
 //
 // TODO: Only deploy "unsecure" versions in PPE, and not PROD 
 //
-  app.route('/unsecure/mentors/:facebookId')
+  app.route('/unsecure/mentors/:userId')
     .get(mentorController.get_a_mentor_unsecure);
 
   app.route('/unsecure/mentees/:mentorId')
@@ -15,9 +15,15 @@ module.exports = function(app) {
 
   app.route('/unsecure/notifications/:userId')
     .get(mentorController.get_notifications_unsecure);
+  
+  app.route('/unsecure/getmentee/:menteeId')
+    .get(mentorController.get_a_mentee_unsecure);
 // --------------------------------------------------------
 
-  app.route('/mentors/:facebookId/:token')
+  app.route('/token/:fedToken/:authType')
+    .get(mentorController.get_id_token);
+
+  app.route('/mentors/:userId/:token')
     .get(mentorController.get_a_mentor);
 
   app.route('/mentees/:mentorId/:token')
@@ -25,4 +31,6 @@ module.exports = function(app) {
 
   app.route('/notifications/:userId/:token')
     .get(mentorController.get_notifications);
+
+
 };

@@ -4,17 +4,14 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MenteeSchema = new Schema({
-  mentor_id: { type: String },
   mentee_id: { type: String },
-  created_date: { 
-    type: Date,
-    default: Date.now
-  },
+  facebook_id: { type: String },
+  google_id: { type: String },
   person: {
     fname: { type: String },
     lname: { type: String },
     kname: { type: String },
-    ffurl: { type: String },
+    fburl: { type: String },
   },
   demo: {
     gender: { type: String },

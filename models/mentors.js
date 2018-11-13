@@ -8,6 +8,7 @@ var MentorSchema = new Schema({
     type: String
   },
   facebook_id: { type: String },
+  google_id: { type: String },
   mentee_ids: { type:[{type:String}]}
 },
 {
