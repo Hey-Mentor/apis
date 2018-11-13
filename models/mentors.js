@@ -4,15 +4,15 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var MentorSchema = new Schema({
-  mentor_id: {
-    type: String
-  },
-  facebook_id: { type: String },
-  google_id: { type: String },
-  mentee_ids: { type:[{type:String}]}
+    mentor_id: {
+        type: String
+    },
+    facebook_id: { type: String },
+    google_id: { type: String },
+    mentee_ids: { type:[{type:String}]}
 },
 {
-  collection: "Mentors"
+    collection: "Mentors"
 });
 
 // NOTE: The 'collection' field here must match the "Collection" on the backend 
