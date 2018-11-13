@@ -4,6 +4,7 @@ var express = require('express'),
     mongoose = require('mongoose'),
     Mentees = require('./models/mentee'),
     Mentors = require('./models/mentors'),
+    Users = require('./models/users'),
     bodyParser = require('body-parser');
 
 // mongoose instance connection url connection

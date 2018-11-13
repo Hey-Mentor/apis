@@ -26,9 +26,9 @@ exports.validate_token = function(req, res) {
                 console.log(data);
                 var appId = data['data']['app_id'];
                 var isValid = data['data']['is_valid'];
-        
+
                 console.log(appId);
-                console.log(isValid);    
+                console.log(isValid);
 
                 var correctApp = appId == '1650628351692070';
 
@@ -42,12 +42,6 @@ exports.validate_token = function(req, res) {
 
         res.send();
 };
-
-
-
-
-
-
 
 
 /*{

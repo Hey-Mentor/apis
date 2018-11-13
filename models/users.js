@@ -8,7 +8,7 @@ var UserSchema = new Schema({
     user_type: { type: String },
     facebook_id: { type: String },
     google_id: { type: String },
-    mentee_ids: { type:[{type:String}]},
+    contacts: { type:[{type:String}]},
     person: {
         fname: { type: String },
         lname: { type: String },
@@ -34,6 +34,6 @@ var UserSchema = new Schema({
     collection: "Users"
 });
 
-// NOTE: The 'collection' field here must match the "Collection" on the backend 
+// NOTE: The 'collection' field here must match the "Collection" on the backend
 
 module.exports = mongoose.model('Users', UserSchema);
