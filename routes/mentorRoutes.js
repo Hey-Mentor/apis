@@ -10,5 +10,4 @@ router.get('/mentors/:facebookId', mentorController.get_a_mentor);
 /// MENTEE ROUTES ///
 router.get('/mentees/:mentorId', mentorController.list_all_mentees);
 
-
 module.exports = router;
