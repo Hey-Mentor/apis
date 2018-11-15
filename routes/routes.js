@@ -1,15 +1,15 @@
 'use strict';
 
 module.exports = function(app) {
-  var menteeList = require('../controllers/controller');
+  var mentorController = require('../controllers/mentorController');
+
+  app.route('/mentors/:facebookId')
+    .get(mentorController.get_a_mentor);
 
   app.route('/mentees/:mentorId')
-    .get(menteeList.list_all_mentees)
-    .post(menteeList.create_a_mentee);
+    .get(mentorController.list_all_mentees);
 
+  app.route('/notifications/:userId')
+    .get(mentorController.get_notifications);
 
-  app.route('/mentee/:mentorId')
-    .get(menteeList.read_a_mentee)
-    .put(menteeList.update_a_mentee)
-    .delete(menteeList.delete_a_mentee);
 };
