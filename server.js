@@ -10,7 +10,7 @@ mongoose.Promise = global.Promise;
 
 //var connectionString = require('./local');
 var connectionString = "mongodb://localhost:27017/HeyMentor";
-mongoose.connect(connectionString);
+mongoose.connect(connectionString, { useNewUrlParser: true });
 
 //var connectionString = process.env.CONNECTION_STRING;
 //mongoose.connect(connectionString);
