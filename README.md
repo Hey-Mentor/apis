@@ -1,5 +1,7 @@
 # Hey Mentor API Surface
 
+https://travis-ci.com/Hey-Mentor/apis.svg?branch=master
+
 ## Overview
 
 The project contains the API surface that supports the following Hey Mentor projects. See the API Surface section below for more details.
