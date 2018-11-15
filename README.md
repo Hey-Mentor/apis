@@ -1,6 +1,6 @@
 # Hey Mentor API Surface
 
-https://travis-ci.com/Hey-Mentor/apis.svg?branch=master
+[![Build Status](https://travis-ci.com/Hey-Mentor/apis.svg?branch=master)](https://travis-ci.com/Hey-Mentor/apis)
 
 ## Overview
 
