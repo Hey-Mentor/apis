@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
-    "express": "^4.16.3",
-    "mongoose": "^5.0.10",
+    "express": "^4.16.4",
+    "mongoose": "^5.3.12",
     "popups": "^1.1.3"
   }
 }
