@@ -1,8 +1,6 @@
 'use strict';
 
 var mongoose = require('mongoose'),
-    Mentees = mongoose.model('Mentees'),
-    Mentors = mongoose.model('Mentors'),
     Users = mongoose.model('Users');
 mongoose.set('debug', true);
 
@@ -23,7 +21,9 @@ const GOOGLE_APP_ID = "12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleu
 
 */
 var validate_facebook_token = function(token) {
-    var fbTokenValidationRequest = `https://graph.facebook.com/debug_token?input_token=${token}&access_token=${token}`;
+    console.log("validate_facebook_token");
+
+    var fbTokenValidationRequest = `https://graph.facebook.com/me?access_token=${token}`;
     const axios = require('axios');
 
     var responseData = axios.get(fbTokenValidationRequest)
@@ -31,24 +31,34 @@ var validate_facebook_token = function(token) {
             return response.data;
         })
         .catch(error => {
-            console.log(error);
+            if (error.response && error.response.data && error.response.data.error && error.response.data.error.message){
+                return Promise.reject(new Error(error.response.data.error.message));
+            }
             return Promise.reject(new Error("Something went wrong during the call to the Facebook token validation endpoint"));
         });
 
     return responseData.then(data => {
-        if (!data || !data['data']){
+        if (!data){
             return Promise.reject(new Error('No data returned from auth request to Facebook'));
         }
 
-        var appId = data['data']['app_id'];
-        var isValid = data['data']['is_valid'];
-        var correctApp = appId == FACEBOOK_APP_ID;
-
-        if (correctApp && isValid){
-            return data['data']['user_id'];
-        }else{
-            return Promise.reject(new Error('Token from Facebook does not contain correct app information, or is invalid'));
-        }
+        // TODO: Facebook doesn't provide an 'aud' claim in the access token to validate
+        //  that the user's access token is intended for our app (as opposed to any other Facebook token).
+        // To check, we will look up the user in the database to see if the access token belongs to a known
+        //  Hey Mentor user.
+        // This is a round trip to the DB that will very likely be repeated. Consider optimizations.
+        var isKnownUser = get_profile_from_fed_id(data['id']);
+        return isKnownUser.then( user => {
+            console.log("Inside validate_facebook_token");
+            console.log(data['id']);
+            console.log(user);
+            console.log(user[0].user_id);
+            if (user[0].user_id){
+                return data['id'];
+            }else{
+                return Promise.reject(new Error('Token from Facebook does not contain correct app information, or is invalid'));
+            }
+        });
     })
     .catch(error => {
         console.log(error);
@@ -115,6 +125,8 @@ var validate_google_token = function(token) {
 
 */
 var get_auth_data_from_idp = function(token, authType) {
+    console.log("get_auth_data_from_idp");
+
     switch (authType) {
         case "facebook":
             return validate_facebook_token(token);
@@ -137,6 +149,8 @@ var get_auth_data_from_idp = function(token, authType) {
 
 */
 var validate_federated_token = function(token, authType) {
+    console.log("validate_federated_token");
+
     if (!token || !authType){
         return Promise.reject(new Error('AuthType and Token are required to validate token'));
     }
@@ -183,7 +197,7 @@ var get_profile_from_fed_id = function(fedId) {
             console.log(err);
             return null;
         }else if (user && user.length > 0){
-            console.log("Got the user");
+            console.log("Got the user - get_profile_from_fed_id");
             return user;
         }else{
             console.log("No matching user");
@@ -199,7 +213,7 @@ var get_profile_from_user_id = function(userId) {
             console.log(err);
             return null;
         }else if (user && user.length > 0){
-            console.log("Got the user");
+            console.log("Got the user - get_profile_from_user_id");
             return user;
         }else{
             console.log("No matching user");
@@ -224,8 +238,9 @@ var get_sendbird_channel = function(user1, user2) {
 
 */
 var send_id_token_result = function(user, fedToken, authType, res){
-    console.log(user);
+    console.log("Sending ID Token");
     var id_token = { "fedToken": fedToken, "user_id": user[0].user_id, "user_type": user[0].user_type, "authType": authType };
+    console.log(id_token);
     return res.json(id_token);
 };
 
@@ -290,7 +305,6 @@ exports.get_messages = function(req, res) {
 };
 
 
-
 /*
 
   API Surface
@@ -312,15 +326,15 @@ exports.get_id_token = function(req, res) {
         if( valid_user ){
             Users.find( { $or:[ {'facebook_id': valid_user}, {'google_id': valid_user} ]}, function(err, user) {
                 if (err){
-                    res.send(err);
                     console.log("Error getting the user");
                     console.log(err);
+                    return res.send(err);
                 }else if (user && user.length > 0){
-                    console.log("Got the user");
-                    send_id_token_result(user, req.params.fedToken, req.params.authType, res);
+                    console.log("Got the user - get_id_token");
+                    return send_id_token_result(user, req.params.fedToken, req.params.authType, res);
                 }else{
                     console.log("No matching user");
-                    res.send("No user");
+                    return res.send("No user");
                 }
             });
         }else{
@@ -334,120 +348,5 @@ exports.get_id_token = function(req, res) {
 };
 
 
-
-// ------------------------------------------------------------
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-*
-* API list_all_mentees
-* Params: mentorId - the unique identifier of a mentee
-* Returns: mentee.json - the mentee details for each mentee of the given mentor
-*
-*/
-exports.list_all_mentees = function(req, res) {
-    validate_token(req.params.token).then( valid => {
-        if( valid ){
-            Mentees.find({ mentee_id: req.params.mentorId }, function(err, mentee) {
-                if (err)
-                    res.send(err);
-                res.json(mentee);
-            });
-        }else{
-            console.log("Invalid token presented to list_all_mentees");
-            res.send("You must make a request with a valid access token");
-        }
-    });
-};
-
-/*exports.update_user_login = function(req, res) {
-    var dt = dateTime.create();
-    var formattedTime = dt.format('Y-m-d_H:M:S');
-    Logins.findOneAndUpdate({user_id: req.params.userId}, {$set:{last_login:formattedTime}, {new: true}, function(err, user) {
-        if (err)
-            res.send(err);
-        res.json(user);
-    });
-};*/
-
-exports.get_a_mentor = function(req, res) {
-    validate_token(req.params.token).then( valid => {
-        if( valid ){
-            Mentors.find({facebook_id: req.params.facebookId}, function(err, mentor){
-                if (err)
-                    res.send(err);
-                res.json(mentor);
-            });
-        }else{
-            console.log("Invalid token presented to get_a_mentor");
-            res.send("You must make a request with a valid access token");
-        }
-    });
-};
-
-exports.get_notifications = function(req, res) {
-    validate_token(req.params.token).then( valid => {
-        if( valid ){
-            Notifications.find({ mentor_id: req.params.mentorId }, function(err, notifications){
-                if (err)
-                    res.send(err);
-                res.json(notifications);
-            });
-        }else{
-            console.log("Invalid token presented to get_notifications");
-            res.send("You must make a request with a valid access token");
-        }
-    });
-};
-
-
-
-//
-// UNSECURE APIS
-//
-exports.list_all_mentees_unsecure = function(req, res) {
-    Mentors.find({ mentor_id: req.params.mentorId }, function(err, mentee) {
-        if (err)
-            res.send(err);
-        res.json(mentee);
-    });
-};
-
-exports.get_a_mentee_unsecure = function(req, res) {
-    console.log("Trying to get a mentee");
-    console.log(req.params.menteeId);
-    Mentees.find({ mentee_id: req.params.menteeId }, function(err, mentee) {
-        if (err)
-            res.send(err);
-        console.log(mentee);
-        res.json(mentee);
-    });
-};
-
-exports.get_a_mentor_unsecure = function(req, res) {
-    Mentors.find({facebook_id: req.params.facebookId}, function(err, mentor){
-        if (err)
-            res.send(err);
-        res.json(mentor);
-    });
-};
-
-exports.get_notifications_unsecure = function(req, res) {
-    Notifications.find({ mentor_id: req.params.mentorId }, function(err, notifications){
-        if (err)
-            res.send(err);
-        res.json(notifications);
-    });
+exports.get_profile_data_unsecure = function(req, res) {
 };

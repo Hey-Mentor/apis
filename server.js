@@ -2,8 +2,6 @@ var express = require('express'),
     app = express(),
     port = process.env.PORT || 3002,
     mongoose = require('mongoose'),
-    Mentees = require('./models/mentee'),
-    Mentors = require('./models/mentors'),
     Users = require('./models/users'),
     bodyParser = require('body-parser');
 

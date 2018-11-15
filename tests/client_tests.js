@@ -5,7 +5,7 @@ const port = 3002;
 var mentee_id = "id7wxwlfpof7920bj0ct";
 var app_id = "1650628351692070";
 
-var access_token = "EAAXdPNyPDSYBAGYy3U5vr0CgTRyx6K4TU0xOUl4yzjLiSo0TyqNSqZACIMM0NgbY2pRFmev2p9VHeYoimVu7TSz5BdcTeDTeELr6COZAwMZCrsAii8RWFecxK8ZACxJGRcEgBEp7RpAlyL1cZAZAA7Bp1N4jJAuIi2QSFqwTTeh3r4aWGjxKfShXp7te6XHCoZD";
+var access_token = "EAAXdPNyPDSYBAAeVOXt4fSZBHlZBRM0EtorsG4xbyy7Tp4akigdf9S4qHPjVyQ6jsgv56pV7ibWfU0N54PhUeN9c6P2Mo9AZAHORmMi4QKPs07DG58a54OSK49cBIWJsOMTMFLgjZAg7mt2MggnSIbIddpmzFIZAYnXTFf99DqZAZC9aOs1MVjsZC00EZBm2V9ZAwZBgA9xXZAwQ9MSLwBU3bLXRB9ONTxtyABrW7QS2Vz2LAAZDZD";
 var auth_type = "facebook";
 
 
@@ -51,7 +51,7 @@ function get_id_token(access_token, auth_type){
     return axios.get(`http://localhost:${port}/token/${access_token}/${auth_type}`)
     .then(response => {
         console.log("Got a response");
-        if (response.data && response.data.fedToken && response.data.fedToken.length > 0 && response.data.authType == "facebook" && response.data.user_type == "mentee" && response.data.user_id.length > 0){
+        if (response.data && response.data.fedToken && response.data.fedToken.length > 0 ){
             return response.data;
         }
     })
@@ -122,7 +122,6 @@ function test_get_contact_profile(){
             var contact_req = get_contact_profile_data(encoded, user_profile[0].contacts[0]);
             contact_req.then( user_profile => {
                 console.log(user_profile);
-
             });
         });
 
