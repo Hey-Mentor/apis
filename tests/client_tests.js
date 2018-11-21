@@ -5,7 +5,7 @@ const port = 3002;
 var mentee_id = "id7wxwlfpof7920bj0ct";
 var app_id = "1650628351692070";
 
-var access_token = "EAAXdPNyPDSYBAFcBvBhucNymlGu0F0o1NQZBFfdNlOIY2OUZAcjRspgodcdusZAOPAewESjiYnonYMnDSgasFuM3rn2TKpayI4ertj8Q8N2HTUbaw9bMUTnkOytPWN0h8yJoELeamZAqD23ZCjrLc2BlYl4kbhhiZB8PMQuluYRdZBUvzj4T2cG51clXyWy5PmRUEyhPj2TXiAYCWU2x3NCH5iP28MioSl0U4iB029gxQKDJnLdT2Hq";
+var access_token = "EAAXdPNyPDSYBAG7DjANkpeMp4KND3xRP3MKOz5yhqFIVBwAmi4jTvDQ5PyzZBltXnJvrLfafSvtwF0fVJwnbA5Icrbw4ZANEqWT5pHdY0rQcxcOIBPhToJgZC8oFfSNfOXZB4XmKbpWM73ok1g8raX2VN3WZB5mndZCyuqRTaZCh0v8LNQXAMfVUWcfgU7QReDWgNL1TgSOaw8IiqCDCL6mWqbVR336nSwQMZClwqcYFrQZDZD";
 var auth_type = "facebook";
 
 
@@ -85,6 +85,63 @@ function get_contact_profile_data(id_token, userId){
     });
 
     return null;
+}
+
+function get_messages(id_token, userId){
+    return axios.get(`http://localhost:${port}/messages/${userId}/${id_token}`)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+    return null;
+}
+
+function create_sendbird_channel(){
+    var userIds = ["mattbo", "joe"];
+    var data = { user_ids: userIds, is_distinct: true}
+    var config = { headers: { "Api-Token": "5cf00ad70137263ae801a160ef86bf3bb2808632"}}
+
+    return axios.post(`https://api.sendbird.com/v3/group_channels`, data, config)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+    return null;
+}
+
+function test_create_channel(){
+    var channel_data = create_sendbird_channel();
+    channel_data.then( data => {
+        console.log("Channel Response:");
+        console.log(data);
+    });
+}
+
+function test_get_my_messages(){
+    var id_token = get_id_token(access_token, auth_type);
+    id_token.then( token => {
+        console.log("Token:");
+        console.log(token);
+
+        let objJsonStr = JSON.stringify(token);
+        let encoded = Buffer.from(objJsonStr).toString("base64");
+
+        var data = get_my_profile_data(encoded);
+        data.then( user_profile => {
+            console.log(user_profile);
+
+            var message_req = get_messages(encoded, user_profile[0].contacts[0]);
+            message_req.then( channel => {
+                console.log(channel);
+            });
+        });
+    });
 }
 
 function test_get_my_profile(){
@@ -168,7 +225,9 @@ function test_user_login_to_facebook() {
 //test_mentee_list_from_mentor();
 //test_get_id_token_facebook();
 //test_get_my_profile();
-test_get_contact_profile();
+//test_get_contact_profile();
+//test_create_channel();
+test_get_my_messages();
 
 /*constructMenteeItemsFromResponse = async (menteeIds, token) => {
         menteeItems = [];

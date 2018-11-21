@@ -32,3 +32,6 @@ exports.delete_a_mentee = function(req, res) {
         res.json({ message: 'Mentee successfully deleted' });
     });
 };
+
+
+  // data: '{"user_ids":["zlmlyyensklvjklsne","nelskjklenfjlsenv"],"is_distinct":true}' },

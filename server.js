@@ -38,3 +38,5 @@ routes(app); //register the route
 app.listen(port);
 
 console.log('API server started on port: ' + port);
+console.log('SendBird secret: ' + process.env.sendbirdkey);
+// $env:sendbirdkey="<SECRET>"; node server.js

@@ -7,6 +7,7 @@ mongoose.set('debug', true);
 const SUPPORTED_AUTH_TYPES = ["facebook", "google"];
 const FACEBOOK_APP_ID = "1650628351692070";
 const GOOGLE_APP_ID = "12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleusercontent.com";
+const axios = require('axios');
 
 /*
 
@@ -24,7 +25,6 @@ var validate_facebook_token = function(token) {
     console.log("validate_facebook_token");
 
     var fbTokenValidationRequest = `https://graph.facebook.com/me?access_token=${token}`;
-    const axios = require('axios');
 
     var responseData = axios.get(fbTokenValidationRequest)
         .then(response => {
@@ -222,8 +222,105 @@ var get_profile_from_user_id = function(userId) {
     });
 };
 
-var get_sendbird_channel = function(user1, user2) {
 
+var get_sendbird_user = function(userId) {
+    // We will use the Hey Mentor user ID as the SendBird user ID
+    // Check if the user was already created in SendBird, otherwise, create it
+    check_sendbird_user_exists(userId).then( exists => {
+        if (exists){
+            return userId;
+        }else{
+            create_sendbird_user(userId, "Nickname").then( created => {
+                if (created){
+                    return userId;
+                }else{
+                    console.log("Something went wrong when trying to get the SendBird user");
+                }
+            });
+        }
+    });
+    /*get_profile_from_user_id(userId).then( user => {
+        if ( user && user.sendbird_id ){
+            return user.sendbird_id
+        }else{
+            // Create the user through SendBird, and update the DB
+            // Note that we should block on DB update before using the new SendBird user
+        }
+    });*/
+};
+
+var check_sendbird_user_exists = function(userId){
+    var config = { headers: { "Api-Token": process.env.sendbirdkey}}
+
+    return axios.get(`https://api.sendbird.com/v3/users/${userId}`, config)
+    .then(response => {
+        if (response && response.data && !response.data.error){
+            return true;
+        }
+        return false;
+    })
+    .catch(error => {
+        console.log(error);
+        return false;
+    });
+
+    return false;
+};
+
+var create_sendbird_user = function(userId, name){
+    var data = { user_id: userId, nickname: name, profile_url: "", profile_file: ""};
+    var config = { headers: { "Api-Token": process.env.sendbirdkey}}
+
+    return axios.post(`https://api.sendbird.com/v3/users`, data, config)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+        console.log("Error during create_sendbird_user");
+    });
+
+    return null;
+};
+
+var create_sendbird_channel = function(userIds){
+    // Note: we must use 'is_distinct': true in order to get the existing channel returned
+    var data = { user_ids: userIds, is_distinct: true}
+    var config = { headers: { "Api-Token": process.env.sendbirdkey}}
+
+    return axios.post(`https://api.sendbird.com/v3/group_channels`, data, config)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+        console.log("Error during create_sendbird_channel");
+    });
+
+    return null;
+};
+
+var get_sendbird_channel = function(user1, user2) {
+    //var user1_final = get_sendbird_user(user1[0].user_id);
+    //var user2_final = get_sendbird_user(user2[0].user_id);
+
+    var users = ["mattbo", "joe"]; //[get_sendbird_user(user1[0].user_id), get_sendbird_user(user2[0].user_id)];
+
+    var channel_data = create_sendbird_channel(users);
+    channel_data.then( data => {
+        if (data){
+            if(data.channel_url){
+                console.log("Returning the SendBird Channel URL");
+                console.log(data.channel_url);
+                return data.channel_url;
+            }
+            console.log("A response was received from SendBird, but we couldn't parse the channel URL");
+        }else{
+            console.log("No response returned from SendBird");
+        }
+
+        return null;
+    });
 };
 
 /*
@@ -302,6 +399,34 @@ exports.get_my_profile_data = function(req, res) {
 
 exports.get_messages = function(req, res) {
     // Params: token, userId
+    validate_identity_token(req.params.token).then( fedId => {
+        if( fedId ){
+            var user1_req = get_profile_from_fed_id(fedId);
+            user1_req.then( user1 => {
+                if( user1 ){
+                    var user2_req = get_profile_from_user_id(req.params.userId);
+                    user2_req.then( user2 => {
+                        if ( user2 ){
+                            if ( user1[0].contacts.includes(user2[0].user_id)){
+                                var channel = get_sendbird_channel(user1, user2);
+                                channel.then( channel_url => {
+                                    console.log("Sending channel");
+                                    var channel_data = { "channel_url": channel_url };
+                                    return res.json(channel_data);
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        }else{
+            console.log("Invalid token presented to get_profile_data");
+            res.send("You must make a request with a valid access token");
+        }
+    }).catch( error => {
+        console.log(error);
+        return res.send("Error");
+    });
 };
 
 
