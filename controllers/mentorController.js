@@ -226,7 +226,7 @@ var get_profile_from_user_id = function(userId) {
 var get_sendbird_user = function(userId) {
     // We will use the Hey Mentor user ID as the SendBird user ID
     // Check if the user was already created in SendBird, otherwise, create it
-    check_sendbird_user_exists(userId).then( exists => {
+    return check_sendbird_user_exists(userId).then( exists => {
         if (exists){
             return userId;
         }else{
@@ -235,6 +235,7 @@ var get_sendbird_user = function(userId) {
                     return userId;
                 }else{
                     console.log("Something went wrong when trying to get the SendBird user");
+                    return null;
                 }
             });
         }
@@ -250,20 +251,25 @@ var get_sendbird_user = function(userId) {
 };
 
 var check_sendbird_user_exists = function(userId){
+    console.log("Does SendBird user exist?");
+
     var config = { headers: { "Api-Token": process.env.sendbirdkey}}
 
     return axios.get(`https://api.sendbird.com/v3/users/${userId}`, config)
     .then(response => {
         if (response && response.data && !response.data.error){
+            console.log("Yes");
             return true;
         }
+        console.log("Nope");
         return false;
     })
     .catch(error => {
-        console.log(error);
+        console.log("Nope");
         return false;
     });
 
+    console.log("Nope");
     return false;
 };
 
@@ -301,26 +307,30 @@ var create_sendbird_channel = function(userIds){
 };
 
 var get_sendbird_channel = function(user1, user2) {
-    //var user1_final = get_sendbird_user(user1[0].user_id);
-    //var user2_final = get_sendbird_user(user2[0].user_id);
+    var user1_final = get_sendbird_user(user1[0].user_id);
+    var user2_final = get_sendbird_user(user2[0].user_id);
 
-    var users = ["mattbo", "joe"]; //[get_sendbird_user(user1[0].user_id), get_sendbird_user(user2[0].user_id)];
+    return Promise.all([user1_final, user2_final]).then( values => {
+        var users = [values[0], values[1]];
+        console.log("users:");
+        console.log(users);
 
-    var channel_data = create_sendbird_channel(users);
-    channel_data.then( data => {
-        if (data){
-            if(data.channel_url){
-                console.log("Returning the SendBird Channel URL");
-                console.log(data.channel_url);
-                return data.channel_url;
+        var channel_data = create_sendbird_channel(users);
+        return channel_data.then( data => {
+            if (data){
+                if(data.channel_url){
+                    console.log(data.channel_url);
+                    return data.channel_url;
+                }
+                console.log("A response was received from SendBird, but we couldn't parse the channel URL");
+            }else{
+                console.log("No response returned from SendBird");
             }
-            console.log("A response was received from SendBird, but we couldn't parse the channel URL");
-        }else{
-            console.log("No response returned from SendBird");
-        }
 
-        return null;
+            return null;
+        });
     });
+
 };
 
 /*
@@ -346,6 +356,13 @@ var send_profile_data_result = function(data, res){
     console.log("Sending profile data back:");
     console.log(data);
     return res.json(data);
+};
+
+var send_channel_data_result = function(channel_url, res){
+    console.log("Sending channel id back:");
+    var channel_data = { "channel_url": channel_url };
+    console.log(channel_data);
+    return res.json(channel_data);
 };
 
 
@@ -410,9 +427,7 @@ exports.get_messages = function(req, res) {
                             if ( user1[0].contacts.includes(user2[0].user_id)){
                                 var channel = get_sendbird_channel(user1, user2);
                                 channel.then( channel_url => {
-                                    console.log("Sending channel");
-                                    var channel_data = { "channel_url": channel_url };
-                                    return res.json(channel_data);
+                                    send_channel_data_result(channel_url, res);
                                 });
                             }
                         }
