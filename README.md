@@ -83,6 +83,10 @@ You can set up your own deployment by following these steps:
 
 In order to execute these tests, you will need to have a valid test user access token for the Facebook app. You can get an access token by navigating to the [Facebook app portal](https://developers.facebook.com/apps/1650628351692070/roles/test-users/) and clicking "Edit" > "Get an access token for this test user".
 
+10. __Running with SendBird:__ In order to run the SendBird APIs, you will need to configure a SendBird application (or ask other devs for an existing one). You will then need to execute the server with an environment variable containing the SendBird API key. 
+
+To do this on Windows, you can run:  `$env:sendbirdkey="<SECRET>"; node server.js`
+
 
 # API Surface
 
