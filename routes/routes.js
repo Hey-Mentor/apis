@@ -1,19 +1,17 @@
-'use strict';
+const mentorController = require('../controllers/mentorController');
 
 module.exports = function(app) {
-    var mentorController = require('../controllers/mentorController');
-
-// --------------------------------------------------------
-//
-// TODO: Only deploy "unsecure" versions in PPE, and not PROD
-//
+    // --------------------------------------------------------
+    //
+    // TODO: Only deploy "unsecure" versions in PPE, and not PROD
+    //
     app.route('/unsecure/user/:userId')
         .get(mentorController.get_profile_data_unsecure);
 
     app.route('/fbaccess')
         .get(mentorController.print_facebook_token);
 
-// --------------------------------------------------------
+    // --------------------------------------------------------
 
     app.route('/token/:fedToken/:authType')
         .get(mentorController.get_id_token);
@@ -27,6 +25,6 @@ module.exports = function(app) {
     app.route('/messages/:userId/:token')
         .get(mentorController.get_messages);
 
-/*    app.route('/notifications/:userId/:token')
-        .get(mentorController.get_notifications);*/
+    /*    app.route('/notifications/:userId/:token')
+            .get(mentorController.get_notifications);*/
 };
