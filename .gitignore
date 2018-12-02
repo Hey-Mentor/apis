@@ -6,3 +6,4 @@ node_modules
 local.js
 productionLocal.js
 *.log
+.vscode
