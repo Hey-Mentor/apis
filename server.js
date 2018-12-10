@@ -1,12 +1,14 @@
 const express = require('express');
+const bodyParser = require('body-parser');
 
 const app = express();
 
 const port = process.env.PORT || 3002;
 
 const mongoose = require('mongoose');
+mongoose.set('debug', true);
 
-const bodyParser = require('body-parser');
+require('./models/users');
 
 // mongoose instance connection url connection
 mongoose.Promise = global.Promise;

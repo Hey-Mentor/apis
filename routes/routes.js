@@ -1,4 +1,5 @@
 const mentorController = require('../controllers/mentorController');
+const auth = require('../middleware/auth');
 
 module.exports = function(app) {
     // --------------------------------------------------------
@@ -6,24 +7,26 @@ module.exports = function(app) {
     // TODO: Only deploy "unsecure" versions in PPE, and not PROD
     //
     app.route('/unsecure/user/:userId')
-        .get(mentorController.get_profile_data_unsecure);
+        .get(mentorController.getProfileDataUnsecure);
 
     app.route('/fbaccess')
-        .get(mentorController.print_facebook_token);
+        .get(mentorController.printFacebookToken);
 
     // --------------------------------------------------------
 
-    app.route('/token/:fedToken/:authType')
-        .get(mentorController.get_id_token);
+    app.use('/', auth.authorize);
 
-    app.route('/profile/:userId/:token')
-        .get(mentorController.get_profile_data);
+    app.route('/token/:authType')
+        .get(mentorController.getIdToken);
 
-    app.route('/me/:token')
-        .get(mentorController.get_my_profile_data);
+    app.route('/profile/:userId')
+        .get(mentorController.getProfileData);
 
-    app.route('/messages/:userId/:token')
-        .get(mentorController.get_messages);
+    app.route('/me')
+        .get(mentorController.getMyProfileData);
+
+    app.route('/messages/:userId')
+        .get(mentorController.getMessages);
 
     /*    app.route('/notifications/:userId/:token')
             .get(mentorController.get_notifications);*/

@@ -92,7 +92,7 @@ To do this on Windows, you can run:  `$env:sendbirdkey="<SECRET>"; node server.j
 
 ## Mobile App API Surface
 
-__Endpoint__: `/token/:fedToken/:authType`
+__Endpoint__: `/token/:authType?fedToken=<token>`
 
 Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate to the API.
 
@@ -101,7 +101,7 @@ Additionally, the identity token is used by the mobile application to determine 
 Response: Identity Token, or Error
 
 
-__Endpoint__: `/profile/:userId/:token`
+__Endpoint__: `/profile/:userId?token=<token>`
 
 Gets the user data of the given user. The token must be a Hey Mentor Identity token.
 
@@ -110,7 +110,7 @@ Note: a user is only allowed to access his/her own profile data, or the profile 
 Response: User profile details, or Error
 
 
-__Endpoint__: `/me/:token`
+__Endpoint__: `/me?token=<token>`
 
 Gets the user data of the current user. The token must be a Hey Mentor Identity token.
 
@@ -119,7 +119,7 @@ Note: a user is only allowed to access his/her own profile data, or the profile 
 Response: User profile details, or Error
 
 
-__Endpoint__: `/messages/:userId/:token`
+__Endpoint__: `/messages/:userId?token=<token>`
 
 Gets the messages between the current user and the user specified by `userId`. The token must be a Hey Mentor Identity token.
 
