@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { logger } = require('../logging/logger');
 
 function getSendBirdUser(userId) {
     // We will use the Hey Mentor user ID as the SendBird user ID
@@ -11,7 +12,7 @@ function getSendBirdUser(userId) {
                 if (created) {
                     return userId;
                 } else {
-                    console.log('Something went wrong when trying to get the SendBird user');
+                    logger.log('info', 'Something went wrong when trying to get the SendBird user');
                     return null;
                 }
             });
@@ -28,73 +29,73 @@ function getSendBirdUser(userId) {
 }
 
 function checkSendBirdUserExists(userId) {
-    console.log('Does SendBird user exist?');
+    logger.log('info', 'Does SendBird user exist?');
 
-    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
+    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
 
     return axios.get(`https://api.sendbird.com/v3/users/${userId}`, config)
         .then((response) => {
             if (response && response.data && !response.data.error) {
-                console.log('Yes');
+                logger.log('info', 'Yes');
                 return true;
             }
-            console.log('Nope');
+            logger.log('info', 'Nope');
             return false;
         })
         .catch((error) => {
-            console.log('Nope');
+            logger.log('info', 'Nope');
             return false;
         });
 }
 
 function createSendBirdUser(userId, name) {
-    const data = {user_id: userId, nickname: name, profile_url: '', profile_file: ''};
-    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
+    const data = { user_id: userId, nickname: name, profile_url: '', profile_file: '' };
+    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
 
     return axios.post(`https://api.sendbird.com/v3/users`, data, config)
         .then((response) => {
             return response.data;
         })
         .catch((error) => {
-            console.log(error);
-            console.log('Error during createSendBirdUser');
+            logger.log('info', error);
+            logger.log('info', 'Error during createSendBirdUser');
         });
 }
 
 function createSendBirdChannel(userIds) {
     // Note: we must use 'is_distinct': true in order to get the existing channel returned
-    const data = {user_ids: userIds, is_distinct: true};
-    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
+    const data = { user_ids: userIds, is_distinct: true };
+    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
 
     return axios.post(`https://api.sendbird.com/v3/group_channels`, data, config)
         .then((response) => {
             return response.data;
         })
         .catch((error) => {
-            console.log(error);
-            console.log('Error during createSendBirdChannel');
+            logger.log('info', error);
+            logger.log('info', 'Error during createSendBirdChannel');
         });
 }
 
-exports.getSendbirdChannel = function(user1, user2) {
+exports.getSendbirdChannel = function (user1, user2) {
     const user1_final = getSendBirdUser(user1[0].user_id);
     const user2_final = getSendBirdUser(user2[0].user_id);
 
     return Promise.all([user1_final, user2_final]).then((values) => {
         const users = [values[0], values[1]];
-        console.log('users:');
-        console.log(users);
+        logger.log('info', 'users:');
+        logger.log('info', users);
 
         const channel_data = createSendBirdChannel(users);
         return channel_data.then((data) => {
             if (data) {
                 if (data.channel_url) {
-                    console.log(data.channel_url);
+                    logger.log('info', data.channel_url);
                     return data.channel_url;
                 }
-                console.log('A response was received from SendBird, but we couldn\'t parse the channel URL');
+                logger.log('info', 'A response was received from SendBird, but we couldn\'t parse the channel URL');
             } else {
-                console.log('No response returned from SendBird');
+                logger.log('info', 'No response returned from SendBird');
             }
 
             return null;

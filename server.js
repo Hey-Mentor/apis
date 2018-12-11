@@ -1,11 +1,12 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const {logger} = require('./logging/logger');
 
 const app = express();
 
 const port = process.env.PORT || 3002;
 
-const mongoose = require('mongoose');
 mongoose.set('debug', true);
 
 require('./models/users');
@@ -22,15 +23,15 @@ mongoose.connect(connectionString, {useNewUrlParser: true});
 
 // Handle the connection event
 const db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+db.on('error', logger.error.bind(logger, 'connection error:'));
 
 db.once('open', function() {
-    console.log('DB connection alive');
+    logger.log('info', 'DB connection alive');
     const Admin = mongoose.mongo.Admin;
     new Admin(db.db).listDatabases(function(err, result) {
-        console.log('listDatabases succeeded');
+        logger.log('info', 'listDatabases succeeded');
         const allDatabases = result.databases;
-        console.log(allDatabases);
+        logger.log('info', allDatabases);
     });
 });
 
@@ -42,6 +43,6 @@ routes(app); // register the route
 
 app.listen(port);
 
-console.log('API server started on port: ' + port);
-console.log('SendBird secret: ' + process.env.sendbirdkey);
+logger.log('info', 'API server started on port: ' + port);
+logger.log('info', 'SendBird secret: ' + process.env.sendbirdkey);
 // $env:sendbirdkey="<SECRET>"; node server.js

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const profile = require('../util/profile');
+const { logger } = require('../logging/logger');
 
 const SUPPORTED_AUTH_TYPES = ['facebook', 'google'];
 const FACEBOOK_APP_ID = '1650628351692070';
@@ -18,7 +19,7 @@ const GOOGLE_APP_ID = '12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleu
 
 */
 function validateFacebookToken(token) {
-    console.log('validateFacebookToken');
+    logger.log('info', 'validateFacebookToken');
 
     const fbTokenValidationRequest = `https://graph.facebook.com/me?access_token=${token}`;
 
@@ -45,10 +46,10 @@ function validateFacebookToken(token) {
         // This is a round trip to the DB that will very likely be repeated. Consider optimizations.
         const isKnownUser = profile.getProfileFromFedId(data['id']);
         return isKnownUser.then((user) => {
-            console.log('Inside validateFacebookToken');
-            console.log(data['id']);
-            console.log(user);
-            console.log(user[0].user_id);
+            logger.log('info', 'Inside validateFacebookToken');
+            logger.log('info', data['id']);
+            logger.log('info', user);
+            logger.log('info', user[0].user_id);
             if (user[0].user_id) {
                 return data['id'];
             } else {
@@ -57,7 +58,7 @@ function validateFacebookToken(token) {
         });
     })
         .catch((error) => {
-            console.log(error);
+            logger.log('info', error);
             return Promise.reject(new Error('Something went wrong during the call to the Facebook token validation endpoint'));
         });
 }
@@ -83,7 +84,7 @@ function validateGoogleToken(token) {
             return response.data;
         })
         .catch((error) => {
-            console.log(error);
+            logger.log('info', error);
             return Promise.reject(new Error('Something went wrong during the call to the Google token validation endpoint'));
         });
 
@@ -102,7 +103,7 @@ function validateGoogleToken(token) {
         }
     })
         .catch((error) => {
-            console.log(error);
+            logger.log('info', error);
             return Promise.reject(new Error('Something went wrong during the call to the Google token validation endpoint'));
         });
 }
@@ -121,13 +122,13 @@ function validateGoogleToken(token) {
 
 */
 function getAuthDataFromIdp(token, authType) {
-    console.log('getAuthDataFromIdp');
+    logger.log('info', 'getAuthDataFromIdp');
 
     switch (authType) {
-    case 'facebook':
-        return validateFacebookToken(token);
-    case 'google':
-        return validateGoogleToken(token);
+        case 'facebook':
+            return validateFacebookToken(token);
+        case 'google':
+            return validateGoogleToken(token);
     }
 }
 
@@ -145,7 +146,7 @@ function getAuthDataFromIdp(token, authType) {
 
 */
 async function validateFederatedToken(token, authType) {
-    console.log('validateFederatedToken');
+    logger.log('info', 'validateFederatedToken');
 
     if (!token || !authType) {
         return Promise.reject(new Error('AuthType and Token are required to validate token'));
@@ -157,11 +158,11 @@ async function validateFederatedToken(token, authType) {
 
     try {
         const user_data = await getAuthDataFromIdp(token, authType);
-        console.log('Data');
-        console.log(user_data);
+        logger.log('info', 'Data');
+        logger.log('info', user_data);
         return user_data;
     } catch (error) {
-        console.log(error);
+        logger.log('info', error);
         return Promise.reject(new Error('Generic error'));
     }
 }
@@ -172,8 +173,8 @@ async function validateIdentityToken(token) {
     }
 
     const decoded = JSON.parse(Buffer.from(token, 'base64').toString());
-    console.log('Decoded token');
-    console.log(decoded);
+    logger.log('info', 'Decoded token');
+    logger.log('info', decoded);
 
     if (!decoded || !decoded.fedToken) {
         return Promise.reject(new Error('No valid token found'));
@@ -183,7 +184,7 @@ async function validateIdentityToken(token) {
     return validateFederatedToken(decoded.fedToken, decoded.authType);
 }
 
-exports.authorize = function(req, res, next) {
+exports.authorize = function (req, res, next) {
     if (req.path.includes('token/')) {
         validateFederatedToken(req.query.fedToken, req.params.authType)
             .then((fedId) => {

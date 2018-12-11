@@ -1,4 +1,4 @@
-
+const { logger } = require('../logging/logger');
 const profile = require('../util/profile');
 const sendbird = require('../util/sendbird');
 
@@ -15,23 +15,23 @@ const sendbird = require('../util/sendbird');
 */
 
 function sendProfileDataResult(data, res) {
-    console.log('Sending profile data back:');
-    console.log(data);
+    logger.log('info', 'Sending profile data back:');
+    logger.log('info', data);
     return res.json(data);
 }
 
 function sendChannelDataResult(channel_url, res) {
-    console.log('Sending channel id back:');
-    const channel_data = {'channel_url': channel_url};
-    console.log(channel_data);
+    logger.log('info', 'Sending channel id back:');
+    const channel_data = { 'channel_url': channel_url };
+    logger.log('info', channel_data);
     return res.json(channel_data);
 }
 
-exports.printFacebookToken = function(req, res) {
+exports.printFacebookToken = function (req, res) {
     res.send(req.query);
 };
 
-exports.getProfileData = function(req, res) {
+exports.getProfileData = function (req, res) {
     const user1_req = profile.getProfileFromFedId(req.fedId);
     user1_req.then((user1) => {
         if (user1) {
@@ -47,15 +47,15 @@ exports.getProfileData = function(req, res) {
     });
 };
 
-exports.getMyProfileData = function(req, res) {
+exports.getMyProfileData = function (req, res) {
     const data = profile.getProfileFromFedId(req.fedId);
     data.then((data) => {
-        console.log('About to send user data back');
+        logger.log('info', 'About to send user data back');
         sendProfileDataResult(data, res);
     });
 };
 
-exports.getMessages = function(req, res) {
+exports.getMessages = function (req, res) {
     const user1_req = profile.getProfileFromFedId(req.fedId);
     user1_req.then((user1) => {
         if (user1) {
@@ -74,5 +74,5 @@ exports.getMessages = function(req, res) {
     });
 };
 
-exports.getProfileDataUnsecure = function(req, res) {
+exports.getProfileDataUnsecure = function (req, res) {
 };
