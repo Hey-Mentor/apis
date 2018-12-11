@@ -1,5 +1,6 @@
-const mentorController = require('../controllers/mentorController');
+const mentorController = require('../controllers/mentor');
 const auth = require('../middleware/auth');
+const tokenController = require('../controllers/token');
 
 module.exports = function(app) {
     // --------------------------------------------------------
@@ -17,7 +18,7 @@ module.exports = function(app) {
     app.use('/', auth.authorize);
 
     app.route('/token/:authType')
-        .get(mentorController.getIdToken);
+        .get(tokenController.getIdToken);
 
     app.route('/profile/:userId')
         .get(mentorController.getProfileData);
