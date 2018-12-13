@@ -1,10 +1,10 @@
 const mongoose = require('mongoose');
-const { logger } = require('../logging/logger');
+const {logger} = require('../logging/logger');
 
 const Users = mongoose.model('Users');
 
-exports.getProfileFromFedId = function (fedId) {
-    return Users.find({ $or: [{ 'facebook_id': fedId }, { 'google_id': fedId }] }, function (err, user) {
+exports.getProfileFromFedId = function(fedId) {
+    return Users.find({$or: [{'facebook_id': fedId}, {'google_id': fedId}]}, function(err, user) {
         if (err) {
             logger.log('info', 'Error getting the user');
             logger.log('info', err);
@@ -19,8 +19,8 @@ exports.getProfileFromFedId = function (fedId) {
     });
 };
 
-exports.getProfileFromUserId = function (userId) {
-    return Users.find({ 'user_id': userId }, function (err, user) {
+exports.getProfileFromUserId = function(userId) {
+    return Users.find({'user_id': userId}, function(err, user) {
         if (err) {
             logger.log('info', 'Error getting the user');
             logger.log('info', err);

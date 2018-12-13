@@ -1,6 +1,6 @@
 const axios = require('axios');
 const profile = require('../util/profile');
-const { logger } = require('../logging/logger');
+const {logger} = require('../logging/logger');
 
 const SUPPORTED_AUTH_TYPES = ['facebook', 'google'];
 const FACEBOOK_APP_ID = '1650628351692070';
@@ -184,7 +184,7 @@ async function validateIdentityToken(token) {
     return validateFederatedToken(decoded.fedToken, decoded.authType);
 }
 
-exports.authorize = function (req, res, next) {
+exports.authorize = function(req, res, next) {
     if (req.path.includes('token/')) {
         validateFederatedToken(req.query.fedToken, req.params.authType)
             .then((fedId) => {

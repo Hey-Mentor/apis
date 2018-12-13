@@ -1,6 +1,7 @@
-const mentorController = require('../controllers/mentor');
-const auth = require('../middleware/auth');
+const messageController = require('../controllers/message');
 const tokenController = require('../controllers/token');
+const profileController = require('../controllers/profile');
+const auth = require('../middleware/auth');
 
 module.exports = function(app) {
     // --------------------------------------------------------
@@ -8,10 +9,10 @@ module.exports = function(app) {
     // TODO: Only deploy "unsecure" versions in PPE, and not PROD
     //
     app.route('/unsecure/user/:userId')
-        .get(mentorController.getProfileDataUnsecure);
+        .get(profileController.getProfileDataUnsecure);
 
     app.route('/fbaccess')
-        .get(mentorController.printFacebookToken);
+        .get(profileController.printFacebookToken);
 
     // --------------------------------------------------------
 
@@ -21,13 +22,13 @@ module.exports = function(app) {
         .get(tokenController.getIdToken);
 
     app.route('/profile/:userId')
-        .get(mentorController.getProfileData);
+        .get(profileController.getProfileData);
 
     app.route('/me')
-        .get(mentorController.getMyProfileData);
+        .get(profileController.getMyProfileData);
 
     app.route('/messages/:userId')
-        .get(mentorController.getMessages);
+        .get(messageController.getMessages);
 
     /*    app.route('/notifications/:userId/:token')
             .get(mentorController.get_notifications);*/

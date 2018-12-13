@@ -1,5 +1,14 @@
 const axios = require('axios');
-const { logger } = require('../logging/logger');
+
+const profile = require('../util/profile');
+const {logger} = require('../logging/logger');
+
+function sendChannelDataResult(channel_url, res) {
+    logger.log('info', 'Sending channel id back:');
+    const channel_data = {'channel_url': channel_url};
+    logger.log('info', channel_data);
+    return res.json(channel_data);
+}
 
 function getSendBirdUser(userId) {
     // We will use the Hey Mentor user ID as the SendBird user ID
@@ -31,7 +40,7 @@ function getSendBirdUser(userId) {
 function checkSendBirdUserExists(userId) {
     logger.log('info', 'Does SendBird user exist?');
 
-    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
+    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
 
     return axios.get(`https://api.sendbird.com/v3/users/${userId}`, config)
         .then((response) => {
@@ -49,8 +58,8 @@ function checkSendBirdUserExists(userId) {
 }
 
 function createSendBirdUser(userId, name) {
-    const data = { user_id: userId, nickname: name, profile_url: '', profile_file: '' };
-    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
+    const data = {user_id: userId, nickname: name, profile_url: '', profile_file: ''};
+    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
 
     return axios.post(`https://api.sendbird.com/v3/users`, data, config)
         .then((response) => {
@@ -64,8 +73,8 @@ function createSendBirdUser(userId, name) {
 
 function createSendBirdChannel(userIds) {
     // Note: we must use 'is_distinct': true in order to get the existing channel returned
-    const data = { user_ids: userIds, is_distinct: true };
-    const config = { headers: { 'Api-Token': process.env.sendbirdkey } };
+    const data = {user_ids: userIds, is_distinct: true};
+    const config = {headers: {'Api-Token': process.env.sendbirdkey}};
 
     return axios.post(`https://api.sendbird.com/v3/group_channels`, data, config)
         .then((response) => {
@@ -77,7 +86,7 @@ function createSendBirdChannel(userIds) {
         });
 }
 
-exports.getSendbirdChannel = function (user1, user2) {
+function getSendbirdChannel(user1, user2) {
     const user1_final = getSendBirdUser(user1[0].user_id);
     const user2_final = getSendBirdUser(user2[0].user_id);
 
@@ -100,5 +109,24 @@ exports.getSendbirdChannel = function (user1, user2) {
 
             return null;
         });
+    });
+}
+
+exports.getMessages = function(req, res) {
+    const user1_req = profile.getProfileFromFedId(req.fedId);
+    user1_req.then((user1) => {
+        if (user1) {
+            const user2_req = profile.getProfileFromUserId(req.params.userId);
+            user2_req.then((user2) => {
+                if (user2) {
+                    if (user1[0].contacts.includes(user2[0].user_id)) {
+                        const channel = getSendbirdChannel(user1, user2);
+                        channel.then((channel_url) => {
+                            sendChannelDataResult(channel_url, res);
+                        });
+                    }
+                }
+            });
+        }
     });
 };

@@ -1,10 +1,22 @@
 const mongoose = require('mongoose');
-const { logger } = require('../logging/logger');
+const {logger} = require('../logging/logger');
 const Users = mongoose.model('Users');
+
+/*
+  Helper Function
+  Callback function used to return a Hey Mentor Identification token after validation and user lookup is complete.
+
+  Params:
+        user - the result of a mongoose call. Should be a user array containing 1 user
+        fedToken - the validated authentication token from a supported identity provider (facebook, google)
+        authType - the authentication type used ("facebook", "google")
+        res - the HTTP response
+
+*/
 
 function sendIdTokenResult(user, fedToken, authType, res) {
     logger.log('info', 'Sending ID Token');
-    const id_token = { 'fedToken': fedToken, 'user_id': user[0].user_id, 'user_type': user[0].user_type, 'authType': authType };
+    const id_token = {'fedToken': fedToken, 'user_id': user[0].user_id, 'user_type': user[0].user_type, 'authType': authType};
     logger.log('info', id_token);
     return res.json(id_token);
 }
@@ -24,8 +36,8 @@ function sendIdTokenResult(user, fedToken, authType, res) {
         Provides an HTTP response to the client via "res" parameter
 
 */
-exports.getIdToken = function (req, res) {
-    Users.find({ $or: [{ 'facebook_id': req.fedId }, { 'google_id': req.fedId }] }, function (err, user) {
+exports.getIdToken = function(req, res) {
+    Users.find({$or: [{'facebook_id': req.fedId}, {'google_id': req.fedId}]}, function(err, user) {
         if (err) {
             logger.log('info', 'Error getting the user');
             logger.log('info', err);
