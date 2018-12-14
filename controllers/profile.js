@@ -30,7 +30,6 @@ exports.getProfileData = function(req, res) {
 exports.getMyProfileData = function(req, res) {
     const data = profile.getProfileFromFedId(req.fedId);
     data.then((data) => {
-        logger.log('info', 'About to send user data back');
         sendProfileDataResult(data, res);
     });
 };

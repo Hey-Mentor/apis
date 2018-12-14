@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const {logger} = require('../logging/logger');
 
-const Users = mongoose.model('Users');
+const Users = mongoose.model('User');
 
 exports.getProfileFromFedId = function(fedId) {
     return Users.find({$or: [{'facebook_id': fedId}, {'google_id': fedId}]}, function(err, user) {

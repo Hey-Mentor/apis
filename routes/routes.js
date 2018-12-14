@@ -1,5 +1,7 @@
+const passport = require('passport');
+
 const messageController = require('../controllers/message');
-const tokenController = require('../controllers/token');
+const registerController = require('../controllers/register');
 const profileController = require('../controllers/profile');
 const auth = require('../middleware/auth');
 
@@ -16,15 +18,18 @@ module.exports = function(app) {
 
     // --------------------------------------------------------
 
-    app.use('/', auth.authorize);
+    app.post('/register/facebook', passport.authenticate('facebook-token', {session: false}),
+        registerController.register);
 
-    app.route('/token/:authType')
-        .get(tokenController.getIdToken);
+    app.post('/register/google', passport.authenticate('google-token', {session: false}),
+        registerController.register);
+
+    app.use('/*/:userId', auth.authorize);
 
     app.route('/profile/:userId')
         .get(profileController.getProfileData);
 
-    app.route('/me')
+    app.route('/me/:userId')
         .get(profileController.getMyProfileData);
 
     app.route('/messages/:userId')

@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+
 const {logger} = require('./logging/logger');
 
 const app = express();
@@ -9,14 +10,12 @@ const port = process.env.PORT || 3002;
 
 mongoose.set('debug', true);
 
-require('./models/users');
-
 // mongoose instance connection url connection
-mongoose.Promise = global.Promise;
-
+mongoose.Promise = require('bluebird');
 // var connectionString = require('./local');
 const connectionString = 'mongodb://localhost:27017/HeyMentor';
 mongoose.connect(connectionString, {useNewUrlParser: true});
+require('./models/users');
 
 // var connectionString = process.env.CONNECTION_STRING;
 // mongoose.connect(connectionString);
