@@ -2,6 +2,7 @@ const uuid = require('uuid/v4');
 const passport = require('passport');
 const mongoose = require('mongoose');
 
+const {logger} = require('../logging/logger');
 const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
@@ -17,6 +18,7 @@ passport.use(new FacebookTokenStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: '',
 }, function(accessToken, refreshToken, profile, done) {
+    profile.authType = AUTH_TYPES.FACEBOOK;
     return done(null, profile);
 }));
 
@@ -25,6 +27,7 @@ passport.use(new GoogleTokenStrategy({
     clientSecret: '',
 },
 function(accessToken, refreshToken, profile, done) {
+    profile.authType = AUTH_TYPES.GOOGLE;
     return done(null, profile);
 }
 ));
@@ -45,14 +48,28 @@ function(accessToken, refreshToken, profile, done) {
 */
 exports.register = function(req, res) {
     const api_key = uuid().replace(/-/g, '');
-    User.create({
+    const user = {
         user_type: req.body['user_type'],
-        facebook_id: req.path.includes(AUTH_TYPES.FACEBOOK) ? req.user.id : null,
-        google_id: req.path.includes(AUTH_TYPES.GOOGLE) ? req.user.id : null,
         api_key: api_key,
-    }).then((user) => {
+    };
+
+    switch (req.user.authType) {
+        case AUTH_TYPES.FACEBOOK:
+            user.facebook_id = req.user.id;
+            user.person = {
+                fname: req.user.name.givenName,
+                lname: req.user.name.familyName,
+            };
+            break;
+        case AUTH_TYPES.GOOGLE:
+            break;
+        default:
+            res.status(400).send('Unknown Auth Type');
+    }
+    User.create(user).then((user) => {
         res.status(201).send({api_key: user.api_key, user_id: user._id});
     }).catch((err) => {
-        res.status(400).send({error: err});
+        logger.log('info', err);
+        res.status(400).send('Could not register user');
     });
 };

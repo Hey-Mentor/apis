@@ -8,8 +8,8 @@ const UserSchema = new Schema({
     api_key: {type: String, required: true},
     contacts: {type: [{type: String}]},
     person: {
-        fname: {type: String},
-        lname: {type: String},
+        fname: {type: String, required: true},
+        lname: {type: String, required: true},
         kname: {type: String},
     },
     demo: {
