@@ -98,7 +98,7 @@ Upgrades a federated identity access token (example: a Facebook access token) fo
 
 Additionally, the identity token is used by the mobile application to determine app behavior, such as whether to present the "Mentor" or "Mentee" UI flow.
 
-Response: Identity Token, or Error
+Response: Identity Token, User ID, or Error
 
 
 __Endpoint__: `/profile/:userId?token=<token>`
@@ -110,7 +110,7 @@ Note: a user is only allowed to access his/her own profile data, or the profile 
 Response: User profile details, or Error
 
 
-__Endpoint__: `/me?token=<token>`
+__Endpoint__: `/me/:userId?token=<token>`
 
 Gets the user data of the current user. The token must be a Hey Mentor Identity token.
 
