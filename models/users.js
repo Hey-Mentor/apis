@@ -3,9 +3,13 @@ const Schema = mongoose.Schema;
 
 const UserSchema = new Schema({
     user_type: {type: String, enum: ['mentor', 'mentee'], required: true},
-    facebook_id: {type: String},
-    google_id: {type: String},
-    api_key: {type: String, required: true},
+    facebook_id: {type: String, required: () => {
+        return this.google_id ? true : false;
+    }},
+    google_id: {type: String, required: () => {
+        return this.facebook_id ? true : false;
+    }},
+    api_key: {type: String},
     contacts: {type: [{type: String}]},
     person: {
         fname: {type: String, required: true},

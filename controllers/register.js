@@ -38,8 +38,7 @@ function(accessToken, refreshToken, profile, done) {
   The Hey Mentor ID token is used for all subsequent API calls requiring authentication.
 
   Params:
-        fedToken - an authentication token from a supported identity provider (facebook, google)
-        authType - the authentication type used ("facebook", "google")
+        access_token - an authentication token from a supported identity provider (facebook, google)
         req - the HTTP request
         res - the HTTP response
   Returns:
@@ -48,28 +47,30 @@ function(accessToken, refreshToken, profile, done) {
 */
 exports.register = function(req, res) {
     const api_key = uuid().replace(/-/g, '');
-    const user = {
-        user_type: req.body['user_type'],
-        api_key: api_key,
-    };
 
     switch (req.user.authType) {
         case AUTH_TYPES.FACEBOOK:
-            user.facebook_id = req.user.id;
-            user.person = {
-                fname: req.user.name.givenName,
-                lname: req.user.name.familyName,
-            };
+            User.find({'facebook_id': req.user.id})
+                .then((user) => {
+                    User.findOneAndUpdate(user[0]._id, {api_key: api_key}, {new: true})
+                        .then((updated_user) => {
+                            res.status(201).send({
+                                api_key: updated_user.api_key,
+                                user_id: updated_user._id,
+                                user_type: updated_user.user_type,
+                            });
+                        })
+                        .catch((err) => {
+                            res.status(400).send('Found user but could not update');
+                        });
+                }).catch((err) => {
+                    logger.log('info', err);
+                    res.status(400).send('Could not find user');
+                });
             break;
         case AUTH_TYPES.GOOGLE:
             break;
         default:
             res.status(400).send('Unknown Auth Type');
     }
-    User.create(user).then((user) => {
-        res.status(201).send({api_key: user.api_key, user_id: user._id});
-    }).catch((err) => {
-        logger.log('info', err);
-        res.status(400).send('Could not register user');
-    });
 };

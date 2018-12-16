@@ -92,7 +92,7 @@ To do this on Windows, you can run:  `$env:sendbirdkey="<SECRET>"; node server.j
 
 ## Mobile App API Surface
 
-__Endpoint__: `/token/<facebook||google>?access_token=<token>`
+__Endpoint__: `/register/<facebook||google>?access_token=<token>`
 
 Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate to the API.
 
