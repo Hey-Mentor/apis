@@ -5,7 +5,7 @@ const port = 3002;
 var mentee_id = "id7wxwlfpof7920bj0ct";
 var app_id = "1650628351692070";
 
-var access_token = "EAAXdPNyPDSYBAG7DjANkpeMp4KND3xRP3MKOz5yhqFIVBwAmi4jTvDQ5PyzZBltXnJvrLfafSvtwF0fVJwnbA5Icrbw4ZANEqWT5pHdY0rQcxcOIBPhToJgZC8oFfSNfOXZB4XmKbpWM73ok1g8raX2VN3WZB5mndZCyuqRTaZCh0v8LNQXAMfVUWcfgU7QReDWgNL1TgSOaw8IiqCDCL6mWqbVR336nSwQMZClwqcYFrQZDZD";
+var access_token = "EAAXdPNyPDSYBABg8GS2ylDTfUUE45K4HIY7aCcCFZCHE0aPamPpd4iaD9EVA3ZCWlVofxHDzJziGr1zjxQnYEIuXkZAwV6MkPnZAPNzxOTgSR1ErhBIS6im0dU0GfuZBa9HX7l85H1MkrrxmAVIyZARAbgZBCyfKO9KSsNoAN2u2NZAozbEco8zUswQPlSuN3nwX0ZBSkEEMG93byfLeehfEI0nJtCKSjne9qO58ZA04xMGwZDZD";
 var auth_type = "facebook";
 
 
@@ -33,7 +33,7 @@ function test_mentee_list_from_mentor() {
 }
 
 function test_get_id_token_facebook(){
-    axios.get(`http://localhost:${port}/token/${access_token}/${auth_type}`)
+    axios.get(`http://localhost:${port}/token/${auth_type}?access_token=${access_token}`)
     .then(response => {
         if (response.data.fedToken.length > 0 && response.data.authType == "facebook" && response.data.user_type == "mentee" && response.data.user_id.length > 0){
             console.log(response.data);
@@ -48,7 +48,7 @@ function test_get_id_token_facebook(){
 
 function get_id_token(access_token, auth_type){
     console.log("Get ID Token");
-    return axios.get(`http://localhost:${port}/token/${access_token}/${auth_type}`)
+    return axios.get(`http://localhost:${port}/token/${auth_type}?access_token=${access_token}`)
     .then(response => {
         console.log("Got a response");
         if (response.data && response.data.fedToken && response.data.fedToken.length > 0 ){
@@ -64,7 +64,7 @@ function get_id_token(access_token, auth_type){
 
 
 function get_my_profile_data(id_token){
-    return axios.get(`http://localhost:${port}/me/${id_token}`)
+    return axios.get(`http://localhost:${port}/me?token=${id_token}`)
     .then(response => {
         return response.data;
     })
@@ -76,7 +76,7 @@ function get_my_profile_data(id_token){
 }
 
 function get_contact_profile_data(id_token, userId){
-    return axios.get(`http://localhost:${port}/profile/${userId}/${id_token}`)
+    return axios.get(`http://localhost:${port}/profile/${userId}?token=${id_token}`)
     .then(response => {
         return response.data;
     })
@@ -88,7 +88,7 @@ function get_contact_profile_data(id_token, userId){
 }
 
 function get_messages(id_token, userId){
-    return axios.get(`http://localhost:${port}/messages/${userId}/${id_token}`)
+    return axios.get(`http://localhost:${port}/messages/${userId}?token=${id_token}`)
     .then(response => {
         return response.data;
     })
@@ -225,9 +225,9 @@ function test_user_login_to_facebook() {
 //test_mentee_list_from_mentor();
 //test_get_id_token_facebook();
 //test_get_my_profile();
-//test_get_contact_profile();
+test_get_contact_profile();
 //test_create_channel();
-test_get_my_messages();
+//test_get_my_messages();
 
 /*constructMenteeItemsFromResponse = async (menteeIds, token) => {
         menteeItems = [];

@@ -10,15 +10,16 @@ module.exports = function(app) {
     //
     // TODO: Only deploy "unsecure" versions in PPE, and not PROD
     //
+    /*
     app.route('/unsecure/user/:userId')
         .get(profileController.getProfileDataUnsecure);
 
     app.route('/fbaccess')
         .get(profileController.printFacebookToken);
-
+    */
     // --------------------------------------------------------
 
-    app.post('/register/facebook', passport.authenticate('facebook-token', {session: false}),
+    app.post('/register/facebook', passport.authenticate('facebook-token', (err, user, info) => {if(err){console.log(err)}}),
         registerController.register);
 
     app.post('/register/google', passport.authenticate('google-token', {session: false}),
