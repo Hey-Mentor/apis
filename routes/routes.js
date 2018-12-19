@@ -20,7 +20,17 @@ module.exports = function(app) {
     */
     // --------------------------------------------------------
 
-    app.post('/register/facebook', passport.authenticate('facebook-token', (err, user, info) => {if(err){console.log(err)}}),
+    app.post('/register/facebook', passport.authenticate('facebook-token', (err, user, info) => {
+            if(err){
+                console.log(err);
+            }
+            if(user){
+                console.log(user);
+            }
+            if(info){
+                console.log(info);
+            }
+        }),
         registerController.register);
 
     app.post('/register/google', passport.authenticate('google-token', {session: false}),

@@ -4,6 +4,7 @@ const User = mongoose.model('User');
 
 exports.authorize = function(req, res, next) {
     logger.log('info', 'Authorize');
+    //logger.log('info', req);
     logger.log('info', 'UserID: ' + req.params.userId);
     
     User.findById(req.params.userId)

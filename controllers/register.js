@@ -46,6 +46,7 @@ function(accessToken, refreshToken, profile, done) {
 
 */
 exports.register = function(req, res) {
+    logger.log('info', "Register");
     const api_key = uuid().replace(/-/g, '');
 
     switch (req.user.authType) {
