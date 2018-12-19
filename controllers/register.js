@@ -8,7 +8,9 @@ const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID; 
+const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
 const GOOGLE_APP_ID = process.env.GOOGLE_APP_ID; 
+
 const AUTH_TYPES = {
     FACEBOOK: 'facebook',
     GOOGLE: 'google',
@@ -16,7 +18,7 @@ const AUTH_TYPES = {
 
 passport.use(new FacebookTokenStrategy({
     clientID: FACEBOOK_APP_ID,
-    clientSecret: '',
+    clientSecret: FACEBOOK_CLIENT_SECRET,
 }, function(accessToken, refreshToken, profile, done) {
     profile.authType = AUTH_TYPES.FACEBOOK;
     return done(null, profile);
@@ -53,8 +55,15 @@ exports.register = function(req, res) {
         case AUTH_TYPES.FACEBOOK:
             User.find({'facebook_id': req.user.id})
                 .then((user) => {
-                    User.findOneAndUpdate(user[0]._id, {api_key: api_key}, {new: true})
+                    logger.log('info', "Found user");
+                    logger.log('info', user);
+                    logger.log('info', "user[0]._id: " + user[0]._id);
+
+                    User.findOneAndUpdate({ _id: user[0]._id}, {api_key: api_key}, {new: true})
                         .then((updated_user) => {
+                            logger.log('info', "Updated user. Sending response");
+                            logger.log('info', updated_user);
+
                             res.status(201).send({
                                 api_key: updated_user.api_key,
                                 user_id: updated_user._id,

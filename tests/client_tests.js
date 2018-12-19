@@ -16,7 +16,8 @@ function register_for_api_key(access_token, auth_type){
     return axios.post(`http://localhost:${port}/register/${auth_type}?access_token=${access_token}`)
     .then(response => {
         console.log("Got a response");
-        if (response.data && response.data.fedToken && response.data.fedToken.length > 0 ){
+        console.log(response);
+        if (response.data){
             return response.data;
         }
     })
@@ -27,8 +28,8 @@ function register_for_api_key(access_token, auth_type){
     return null;
 }
 
-function get_user_profile_data(id_token, userId){
-    return axios.get(`http://localhost:${port}/profile/${userId}?token=${id_token}`)
+function get_user_profile_data(api_key, userId){
+    return axios.get(`http://localhost:${port}/profile/${userId}?token=${api_key}`)
     .then(response => {
         return response.data;
     })
@@ -39,8 +40,8 @@ function get_user_profile_data(id_token, userId){
     return null;
 }
 
-function get_messages(id_token, userId){
-    return axios.get(`http://localhost:${port}/messages/${userId}?token=${id_token}`)
+function get_messages(api_key, userId){
+    return axios.get(`http://localhost:${port}/messages/${userId}?token=${api_key}`)
     .then(response => {
         return response.data;
     })
@@ -89,23 +90,19 @@ function test_register_user(){
     api_key_obj.then( api_key => {
         console.log("API Key Object:");
         console.log(api_key);
+        console.log(api_key.api_key)
     });
 }
 
 function test_get_my_messages(){
     var api_key_obj = register_for_api_key(access_token, auth_type);
     api_key_obj.then( api_key => {
-        console.log("api_key:");
-        console.log(api_key);
-
-        let objJsonStr = JSON.stringify(api_key);
-        let encoded = Buffer.from(objJsonStr).toString("base64");
-
-        var data = get_my_profile_data(encoded);
+        var key = api_key.api_key;
+        var data = get_user_profile_data(key, api_key.user_id);
         data.then( user_profile => {
-            console.log(user_profile);
+            console.log("Contacts: " + user_profile.contacts[0]);
 
-            var message_req = get_messages(encoded, user_profile[0].contacts[0]);
+            var message_req = get_messages(key, user_profile.contacts[0]);
             message_req.then( channel => {
                 console.log(channel);
             });
@@ -114,38 +111,25 @@ function test_get_my_messages(){
 }
 
 function test_get_my_profile(){
-    var id_token = get_id_token(access_token, auth_type);
-    id_token.then( token => {
-        console.log("Token:");
-        console.log(token);
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
 
-        let objJsonStr = JSON.stringify(token);
-        let encoded = Buffer.from(objJsonStr).toString("base64");
-
-        var data = get_my_profile_data(encoded);
+        var data = get_user_profile_data(api_key.api_key, api_key.user_id);
         data.then( user_profile => {
             console.log(user_profile);
-            if (user_profile[0].person.fname == "Larry"){
-                console.log("TEST PASSED");
-            }
         });
     });
 }
 
 function test_get_contact_profile(){
-    var id_token = get_id_token(access_token, auth_type);
-    id_token.then( token => {
-        console.log("Token:");
-        console.log(token);
-
-        let objJsonStr = JSON.stringify(token);
-        let encoded = Buffer.from(objJsonStr).toString("base64");
-
-        var data = get_my_profile_data(encoded);
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
+        var key = api_key.api_key;
+        var data = get_user_profile_data(key, api_key.user_id);
         data.then( user_profile => {
-            console.log(user_profile);
+            console.log(user_profile.contacts[0]);
 
-            var contact_req = get_contact_profile_data(encoded, user_profile[0].contacts[0]);
+            var contact_req = get_user_profile_data(key, user_profile.contacts[0]);
             contact_req.then( user_profile => {
                 console.log(user_profile);
             });
@@ -155,11 +139,7 @@ function test_get_contact_profile(){
 
 
 
-test_register_user();
-
-//test_mentee_list_from_mentor();
-//test_get_id_token_facebook();
+//test_register_user();
 //test_get_my_profile();
 //test_get_contact_profile();
-//test_create_channel();
-//test_get_my_messages();
+test_get_my_messages();
