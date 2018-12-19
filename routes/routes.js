@@ -4,6 +4,7 @@ const messageController = require('../controllers/message');
 const registerController = require('../controllers/register');
 const profileController = require('../controllers/profile');
 const auth = require('../middleware/auth');
+const error = require('../middleware/error');
 
 module.exports = function(app) {
     // --------------------------------------------------------
@@ -30,12 +31,11 @@ module.exports = function(app) {
     app.route('/profile/:userId')
         .get(profileController.getProfileData);
 
-    app.route('/me/:userId')
-        .get(profileController.getMyProfileData);
-
     app.route('/messages/:userId')
         .get(messageController.getMessages);
 
     /*    app.route('/notifications/:userId/:token')
             .get(mentorController.get_notifications);*/
+
+    app.use(error.error);
 };
