@@ -7,8 +7,8 @@ const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
-const FACEBOOK_APP_ID = '1650628351692070';
-const GOOGLE_APP_ID = '12899066904-jqhmi5uhav530aerctj631gltumqvk8i.apps.googleusercontent.com';
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID; 
+const GOOGLE_APP_ID = process.env.GOOGLE_APP_ID; 
 const AUTH_TYPES = {
     FACEBOOK: 'facebook',
     GOOGLE: 'google',

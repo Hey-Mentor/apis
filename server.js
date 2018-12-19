@@ -6,19 +6,18 @@ const {logger} = require('./logging/logger');
 
 const app = express();
 
-const port = process.env.PORT || 3002;
+const port = process.env.PORT || 8081;
 
 mongoose.set('debug', true);
 
 // mongoose instance connection url connection
 mongoose.Promise = require('bluebird');
-// var connectionString = require('./local');
-const connectionString = 'mongodb://localhost:27017/HeyMentor';
-mongoose.connect(connectionString, {useNewUrlParser: true});
+//const connectionString = 'mongodb://localhost:27017/HeyMentor';
+//mongoose.connect(connectionString, {useNewUrlParser: true});
 require('./models/users');
 
-// var connectionString = process.env.CONNECTION_STRING;
-// mongoose.connect(connectionString);
+var connectionString = process.env.CONNECTION_STRING;
+mongoose.connect(connectionString);
 
 // Handle the connection event
 const db = mongoose.connection;
