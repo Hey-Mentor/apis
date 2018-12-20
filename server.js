@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
@@ -11,8 +12,11 @@ mongoose.set('debug', true);
 mongoose.Promise = require('bluebird');
 require('./models/users');
 
-var connectionString = process.env.CONNECTION_STRING;
-mongoose.connect(connectionString, { useNewUrlParser: true });
+const connectionString = process.env.NODE_ENV === 'production'
+    ? process.env.CONNECTION_STRING
+    : process.env.TEST_CONNECTION_STRING;
+
+mongoose.connect(connectionString, {useNewUrlParser: true});
 
 // Handle the connection event
 const db = mongoose.connection;
