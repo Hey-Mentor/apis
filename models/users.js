@@ -5,12 +5,12 @@ const UserSchema = new Schema({
     user_type: {type: String, enum: ['mentor', 'mentee'], required: true},
     facebook_id: {type: String, required: () => {
         return this.google_id ? true : false;
-    }},
+    }, unique: true},
     google_id: {type: String, required: () => {
         return this.facebook_id ? true : false;
-    }},
+    }, unique: true},
     api_key: {type: String},
-    contacts: {type: [{type: String}]},
+    contacts: {type: [{type: Schema.Types.ObjectId}]},
     person: {
         fname: {type: String, required: true},
         lname: {type: String, required: true},
@@ -36,7 +36,5 @@ const UserSchema = new Schema({
     // NOTE: The 'collection' field here must match the "Collection" on the backend
     collection: 'Users',
 });
-
-UserSchema.index({facebook_id: 1, google_id: 1}, {unique: true});
 
 module.exports = mongoose.model('User', UserSchema);

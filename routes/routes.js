@@ -31,6 +31,9 @@ module.exports = function(app) {
     app.route('/profile/:userId')
         .get(profileController.getProfileData);
 
+    app.route('/contacts/:userId')
+        .get(profileController.getContacts);
+
     app.route('/messages/:userId')
         .get(messageController.getMessages);
 

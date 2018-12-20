@@ -3,8 +3,14 @@ const {logger} = require('../logging/logger');
 
 const Users = mongoose.model('User');
 
-exports.printFacebookToken = function(req, res) {
-    res.send(req.query);
+// WARNING any schema properties in this object will be exposed to other clients,
+// do not put sensitive schema properties in this object
+const PUBLIC_CONTACT_SCHEMA = {
+    person: 1,
+    demo: 1,
+    gen_interest: 1,
+    spec_interests: 1,
+    user_type: 1,
 };
 
 exports.getProfileData = function(req, res) {
@@ -19,9 +25,18 @@ exports.getProfileData = function(req, res) {
         });
 };
 
-exports.getMyProfileData = function(req, res) {
-
-};
-
-exports.getProfileDataUnsecure = function(req, res) {
+exports.getContacts = function(req, res) {
+    Users.findById(req.user._id, {contacts: 1})
+        .then((query) => {
+            return Users.find({
+                '_id': {$in: query.contacts.map((contact) => new mongoose.Types.ObjectId(contact)),
+                }}, PUBLIC_CONTACT_SCHEMA);
+        })
+        .then((contacts) => {
+            res.json(contacts);
+        })
+        .catch((err) => {
+            logger.error(err);
+            res.status(500).json({'Error': 'Something went wrong'});
+        });
 };
