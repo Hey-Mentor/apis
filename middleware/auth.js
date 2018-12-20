@@ -3,10 +3,9 @@ const mongoose = require('mongoose');
 const User = mongoose.model('User');
 
 exports.authorize = function(req, res, next) {
-    logger.log('info', 'Authorize');
-    //logger.log('info', req);
-    logger.log('info', 'UserID: ' + req.params.userId);
-    
+    logger.info('Authorize');
+    logger.info('UserID: ' + req.params.userId);
+
     User.findById(req.params.userId)
         .then((user) => {
             if (user.api_key === req.query.token) {

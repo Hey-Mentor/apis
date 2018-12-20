@@ -19,12 +19,12 @@ const db = mongoose.connection;
 db.on('error', logger.error.bind(logger, 'connection error:'));
 
 db.once('open', function() {
-    logger.log('info', 'DB connection alive');
+    logger.info('DB connection alive');
     const Admin = mongoose.mongo.Admin;
     new Admin(db.db).listDatabases(function(err, result) {
-        logger.log('info', 'listDatabases succeeded');
+        logger.info('listDatabases succeeded');
         const allDatabases = result.databases;
-        logger.log('info', allDatabases);
+        logger.info(allDatabases);
     });
 });
 
@@ -36,6 +36,6 @@ routes(app); // register the route
 
 app.listen(port);
 
-logger.log('info', 'API server started on port: ' + port);
-logger.log('info', 'SendBird secret: ' + process.env.sendbirdkey);
+logger.info('API server started on port: ' + port);
+logger.info('SendBird secret: ' + process.env.sendbirdkey);
 // $env:sendbirdkey="<SECRET>"; node server.js

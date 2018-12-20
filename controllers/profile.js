@@ -8,8 +8,8 @@ exports.printFacebookToken = function(req, res) {
 };
 
 exports.getProfileData = function(req, res) {
-    logger.log('info', "Getting profile data for user");
-    logger.log('info', "ID: " + req.user._id);
+    logger.info('Getting profile data for user');
+    logger.info('ID: ' + req.user._id);
 
     Users.findById(req.user._id)
         .then((data) => res.json(data))

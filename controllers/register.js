@@ -7,9 +7,9 @@ const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
 
-const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID; 
+const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
-const GOOGLE_APP_ID = process.env.GOOGLE_APP_ID; 
+const GOOGLE_APP_ID = process.env.GOOGLE_APP_ID;
 
 const AUTH_TYPES = {
     FACEBOOK: 'facebook',
@@ -48,21 +48,21 @@ function(accessToken, refreshToken, profile, done) {
 
 */
 exports.register = function(req, res) {
-    logger.log('info', "Register");
+    logger.info('Register');
     const api_key = uuid().replace(/-/g, '');
 
     switch (req.user.authType) {
         case AUTH_TYPES.FACEBOOK:
             User.find({'facebook_id': req.user.id})
                 .then((user) => {
-                    logger.log('info', "Found user");
-                    logger.log('info', user);
-                    logger.log('info', "user[0]._id: " + user[0]._id);
+                    logger.info('Found user');
+                    logger.info(user);
+                    logger.info('user[0]._id: ' + user[0]._id);
 
-                    User.findOneAndUpdate({ _id: user[0]._id}, {api_key: api_key}, {new: true})
+                    User.findOneAndUpdate({_id: user[0]._id}, {api_key: api_key}, {new: true})
                         .then((updated_user) => {
-                            logger.log('info', "Updated user. Sending response");
-                            logger.log('info', updated_user);
+                            logger.info('Updated user. Sending response');
+                            logger.info(updated_user);
 
                             res.status(201).send({
                                 api_key: updated_user.api_key,
@@ -74,7 +74,7 @@ exports.register = function(req, res) {
                             res.status(400).send('Found user but could not update');
                         });
                 }).catch((err) => {
-                    logger.log('info', err);
+                    logger.info(err);
                     res.status(400).send('Could not find user');
                 });
             break;

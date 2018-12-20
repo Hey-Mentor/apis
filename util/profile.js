@@ -6,14 +6,14 @@ const Users = mongoose.model('User');
 exports.getProfileFromFedId = function(fedId) {
     return Users.find({$or: [{'facebook_id': fedId}, {'google_id': fedId}]}, function(err, user) {
         if (err) {
-            logger.log('info', 'Error getting the user');
-            logger.log('info', err);
+            logger.info('Error getting the user');
+            logger.info(err);
             return null;
         } else if (user && user.length > 0) {
-            logger.log('info', 'Got the user - getProfileFromFedId');
+            logger.info('Got the user - getProfileFromFedId');
             return user;
         } else {
-            logger.log('info', 'No matching user');
+            logger.info('No matching user');
             return null;
         }
     });
@@ -22,14 +22,14 @@ exports.getProfileFromFedId = function(fedId) {
 exports.getProfileFromUserId = function(userId) {
     return Users.find({'user_id': userId}, function(err, user) {
         if (err) {
-            logger.log('info', 'Error getting the user');
-            logger.log('info', err);
+            logger.info('Error getting the user');
+            logger.info(err);
             return null;
         } else if (user && user.length > 0) {
-            logger.log('info', 'Got the user - getProfileFromUserId');
+            logger.info('Got the user - getProfileFromUserId');
             return user;
         } else {
-            logger.log('info', 'No matching user');
+            logger.info('No matching user');
             return null;
         }
     });
