@@ -27,14 +27,8 @@ exports.getProfileData = function(req, res) {
 
 exports.getContacts = function(req, res) {
     Users.findById(req.user._id, {contacts: 1})
-        .then((query) => {
-            return Users.find({
-                '_id': {$in: query.contacts.map((contact) => new mongoose.Types.ObjectId(contact)),
-                }}, PUBLIC_CONTACT_SCHEMA);
-        })
-        .then((contacts) => {
-            res.json(contacts);
-        })
+        .populate('contacts', PUBLIC_CONTACT_SCHEMA)
+        .then((contacts) => res.json(contacts))
         .catch((err) => {
             logger.error(err);
             res.status(500).json({'Error': 'Something went wrong'});

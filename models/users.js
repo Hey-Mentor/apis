@@ -10,7 +10,7 @@ const UserSchema = new Schema({
         return this.facebook_id ? true : false;
     }, unique: true},
     api_key: {type: String},
-    contacts: {type: [{type: Schema.Types.ObjectId}]},
+    contacts: {type: [{type: Schema.Types.ObjectId, ref: 'User'}]},
     person: {
         fname: {type: String, required: true},
         lname: {type: String, required: true},
