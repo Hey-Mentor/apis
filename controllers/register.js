@@ -2,10 +2,10 @@ const uuid = require('uuid/v4');
 const passport = require('passport');
 const mongoose = require('mongoose');
 
-const {logger} = require('../logging/logger');
 const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const { logger } = require('../logging/logger');
 
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
@@ -19,20 +19,19 @@ const AUTH_TYPES = {
 passport.use(new FacebookTokenStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_CLIENT_SECRET,
-}, function(accessToken, refreshToken, profile, done) {
+}, ((accessToken, refreshToken, profile, done) => {
     profile.authType = AUTH_TYPES.FACEBOOK;
     return done(null, profile);
-}));
+})));
 
 passport.use(new GoogleTokenStrategy({
     clientID: GOOGLE_APP_ID,
     clientSecret: '',
 },
-function(accessToken, refreshToken, profile, done) {
+((accessToken, refreshToken, profile, done) => {
     profile.authType = AUTH_TYPES.GOOGLE;
     return done(null, profile);
-}
-));
+})));
 /*
 
   API Surface
@@ -47,19 +46,19 @@ function(accessToken, refreshToken, profile, done) {
         Provides an HTTP response to the client via "res" parameter
 
 */
-exports.register = function(req, res) {
+exports.register = function (req, res) {
     logger.info('Register');
     const api_key = uuid().replace(/-/g, '');
 
     switch (req.user.authType) {
         case AUTH_TYPES.FACEBOOK:
-            User.find({'facebook_id': req.user.id})
+            User.find({ facebook_id: req.user.id })
                 .then((user) => {
                     logger.info('Found user');
                     logger.info(user);
-                    logger.info('user[0]._id: ' + user[0]._id);
+                    logger.info(`user[0]._id: ${user[0]._id}`);
 
-                    User.findOneAndUpdate({_id: user[0]._id}, {api_key: api_key}, {new: true})
+                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key }, { new: true })
                         .then((updated_user) => {
                             logger.info('Updated user. Sending response');
                             logger.info(updated_user);
@@ -71,6 +70,7 @@ exports.register = function(req, res) {
                             });
                         })
                         .catch((err) => {
+                            logger.error(err);
                             res.status(400).send('Found user but could not update');
                         });
                 }).catch((err) => {
