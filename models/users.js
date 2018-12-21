@@ -11,16 +11,18 @@ const UserSchema = new Schema({
     facebook_id: {
         type: String,
         required() {
-            return !!this.google_id;
+            return !this.google_id;
         },
         unique: true,
     },
     google_id: {
         type: String,
-        required: () => !!this.facebook_id,
+        required: () => !this.facebook_id,
         unique: true,
     },
-    api_key: { type: String },
+    api_key: {
+        type: String,
+    },
     contacts: {
         type: [{
             type: Schema.Types.ObjectId,
@@ -38,15 +40,14 @@ const UserSchema = new Schema({
         kname: { type: String },
     },
     demo: {
-        gender: { type: String },
         race: { type: String },
         eth: { type: String },
     },
     school: {
         name: { type: String },
-        grade: { type: String },
-        gpa: { type: String },
-        sat: { type: String },
+        grade: { type: Number },
+        gpa: { type: Number },
+        sat: { type: Number },
     },
     gen_interest: {
         type: String,
