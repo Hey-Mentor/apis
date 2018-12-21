@@ -26,8 +26,8 @@ const fake_users = new Array(5).fill().map(() => ({
         kname: faker.name.prefix(),
     },
     demo: {
-        race: faker.random.arrayElement(['Asian', 'Black', 'Brown', 'White']),
-        eth: faker.random.arrayElement(['European', 'Native American', 'Hispanic']),
+        race: faker.lorem.word(),
+        eth: faker.lorem.word(),
     },
     school: {
         name: faker.lorem.sentence(3),
