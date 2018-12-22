@@ -43,10 +43,12 @@ const fake_users = new Array(5).fill().map(() => ({
 
 const db = mongoose.connection;
 db.once('open', () => {
-    User.insertMany(fake_users.slice(1))
-        .then(users => User.create(Object.assign(fake_users[0], {
-            contacts: users.map(user => user._id),
-            _id: OBJECT_ID,
-        })))
-        .then(() => mongoose.connection.close());
+    User.remove({}).then(() => {
+        User.insertMany(fake_users.slice(1))
+            .then(users => User.create(Object.assign(fake_users[0], {
+                contacts: users.map(user => user._id),
+                _id: OBJECT_ID,
+            })))
+            .then(() => mongoose.connection.close());
+    });
 });
