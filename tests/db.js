@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const faker = require('faker');
+const Promise = require('bluebird');
+
 require('dotenv').config();
 
 require('../models/users');
@@ -11,14 +13,13 @@ const connectionString = process.env.TEST_CONNECTION_STRING;
 mongoose.connect(connectionString, { useNewUrlParser: true });
 
 // Keep object ID and API key constant to avoid finding it after every db generation
-const OBJECT_ID = '5c15446bbf35ae4057631c3d';
-const API_KEY = 'b5697c49ffea4d04a8b0b3c3bbfe8eaf';
 
-const fake_users = new Array(5).fill().map(() => ({
+
+const fake_users = new Array(10).fill().map(() => ({
     user_type: faker.random.arrayElement(['mentor', 'mentee']),
     facebook_id: faker.random.alphaNumeric(20),
     google_id: faker.random.alphaNumeric(20),
-    api_key: API_KEY,
+    api_key: process.env.TEST_API_KEY,
     contacts: [],
     person: {
         fname: faker.name.firstName(),
@@ -42,13 +43,23 @@ const fake_users = new Array(5).fill().map(() => ({
 }));
 
 const db = mongoose.connection;
-db.once('open', () => {
-    User.remove({}).then(() => {
-        User.insertMany(fake_users.slice(1))
-            .then(users => User.create(Object.assign(fake_users[0], {
-                contacts: users.map(user => user._id),
-                _id: OBJECT_ID,
-            })))
-            .then(() => mongoose.connection.close());
+
+module.exports.populateDB = function () {
+    return db.once('open', () => {
+        User.deleteMany({}).then(() => {
+            User.insertMany(fake_users.slice(1))
+                .then(users => users.map(user => user._id))
+                .then((user_ids) => {
+                    const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
+                        contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
+                    }));
+                    ops.push(User.create(Object.assign(fake_users[0], {
+                        contacts: user_ids.map(user => user._id),
+                        _id: process.env.TEST_USER_ID,
+                    })));
+                    return Promise.all(ops);
+                })
+                .then(() => mongoose.connection.close());
+        });
     });
-});
+};
