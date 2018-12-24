@@ -5,12 +5,13 @@ const chai = require('chai');
 require('dotenv').config();
 chai.use(require('chai-http'));
 
+process.env.NODE_ENV = 'test';
+
 const db_util = require('./db_util');
 
 const app = require('../server');
 
 // During the test the env variable is set to test
-process.env.NODE_ENV = 'test';
 
 mongoose.connect(process.env.TEST_CONNECTION_STRING, { useNewUrlParser: true });
 
@@ -30,7 +31,7 @@ describe('API', function () {
         });
     });
 
-    describe('/GET profile', function () {
+    describe('/GET Bad API key', function () {
         it('should reject an incorrect api key', function () {
             return request.get(`/profile/${process.env.TEST_USER_ID}?token=badkey123`)
                 .then((res) => {
@@ -43,7 +44,7 @@ describe('API', function () {
         });
     });
 
-    describe('/GET profile', function () {
+    describe('/GET Bad User ID', function () {
         it('should reject a non-existent user', function () {
             return request.get(`/profile/123456789123456789123456?token=${process.env.TEST_API_KEY}`)
                 .then((res) => {
