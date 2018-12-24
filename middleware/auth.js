@@ -4,17 +4,13 @@ const { logger } = require('../logging/logger');
 const User = mongoose.model('User');
 
 exports.authorize = function (req, res, next) {
-    logger.info('Authorize');
-    logger.info(`UserID: ${req.params.userId}`);
-
-    User.findById(req.params.userId)
+    User.findOne({ _id: req.params.userId, api_key: req.query.token })
         .then((user) => {
-            if (user.api_key === req.query.token) {
-                req.user = user;
-                next();
-            } else {
-                return res.status(401).send('Unauthorized');
+            if (!user) {
+                throw new Error();
             }
+            req.user = user;
+            return next();
         }).catch((err) => {
             logger.error(err);
             res.status(401).send('Unauthorized');

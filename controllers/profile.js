@@ -14,15 +14,7 @@ const PUBLIC_CONTACT_SCHEMA = {
 };
 
 exports.getProfileData = function (req, res) {
-    logger.info('Getting profile data for user');
-    logger.info(`ID: ${req.user._id}`);
-
-    Users.findById(req.user._id)
-        .then(data => res.json(data))
-        .catch((err) => {
-            logger.error(err);
-            res.status(500).json({ Error: 'Something went wrong' });
-        });
+    return res.status(200).json(req.user);
 };
 
 exports.getContacts = function (req, res) {
