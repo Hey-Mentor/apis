@@ -17,7 +17,9 @@ const UserSchema = new Schema({
     },
     google_id: {
         type: String,
-        required: () => !this.facebook_id,
+        required() {
+            return !this.facebook_id;
+        },
         unique: true,
     },
     api_key: {

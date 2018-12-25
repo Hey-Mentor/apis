@@ -35,6 +35,26 @@ const fake_users = new Array(10).fill().map(() => ({
     support: new Array(3).fill().map(() => faker.lorem.words(1)),
 }));
 
+// Check fake_users has a value for each schema attribute
+User.schema.eachPath((path) => {
+    // Ignore mongoose attributes
+    if (path[0] === '_') { return; }
+
+    const user = fake_users[0];
+    if (path.includes('.')) {
+        const keys = path.split('.');
+        let prop = user;
+        keys.forEach((key) => {
+            if (!prop[key]) {
+                throw new Error(`Mock data lacking schema property: ${path}`);
+            }
+            prop = prop[key];
+        });
+    } else if (!user[path]) {
+        throw new Error(`Mock data lacking schema property: ${path}`);
+    }
+});
+
 
 module.exports.populateDB = function () {
     return User.deleteMany({}).then(() => {
