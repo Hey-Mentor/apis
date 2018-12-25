@@ -16,6 +16,13 @@ const AUTH_TYPES = {
     GOOGLE: 'google',
 };
 
+// Schema properties returned to client
+const REGISTER_SCHEMA = {
+    api_key: 1,
+    _id: 1,
+    user_type: 1,
+};
+
 passport.use(new FacebookTokenStrategy({
     clientID: FACEBOOK_APP_ID,
     clientSecret: FACEBOOK_CLIENT_SECRET,
@@ -54,21 +61,12 @@ exports.register = function (req, res) {
         case AUTH_TYPES.FACEBOOK:
             User.find({ facebook_id: req.user.id })
                 .then((user) => {
-                    logger.info('Found user');
-                    logger.info(user);
-                    logger.info(`user[0]._id: ${user[0]._id}`);
-
-                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key }, { new: true })
-                        .then((updated_user) => {
-                            logger.info('Updated user. Sending response');
-                            logger.info(updated_user);
-
-                            res.status(201).send({
-                                api_key: updated_user.api_key,
-                                user_id: updated_user._id,
-                                user_type: updated_user.user_type,
-                            });
-                        })
+                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key }, {
+                        new: true,
+                        select: REGISTER_SCHEMA,
+                        strict: true,
+                    })
+                        .then(updated_user => res.status(201).send(updated_user))
                         .catch((err) => {
                             logger.error(err);
                             res.status(400).send('Found user but could not update');
