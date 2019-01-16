@@ -22,6 +22,7 @@ const fake_users = new Array(10).fill().map(() => ({
     demo: {
         race: faker.lorem.word(),
         eth: faker.lorem.word(),
+        gender: faker.random.arrayElement(['male', 'female', 'nonbinary', 'other']),
     },
     school: {
         name: faker.lorem.sentence(3),
@@ -55,7 +56,7 @@ User.schema.eachPath((path) => {
     }
 });
 
-
+// Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
     return User.deleteMany({}).then(() => {
         User.insertMany(fake_users.slice(1))

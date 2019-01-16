@@ -7,7 +7,7 @@ chai.use(require('chai-http'));
 
 process.env.NODE_ENV = 'test';
 
-const db_util = require('./db_util');
+const db_util = require('../tools/db_util');
 
 const app = require('../server');
 
@@ -21,7 +21,6 @@ const request = chai.request(app).keepOpen();
 
 /* eslint-disable prefer-arrow-callback */
 
-// Our parent block
 describe('API', function () {
     before(function (done) {
         // Before running suite we populate the db
@@ -82,6 +81,7 @@ describe('API', function () {
                     assert.typeOf(res.body.contacts, 'array');
                     assert.notExists(res.body.contacts[0].api_key);
                     assert.typeOf(res.body._id, 'string');
+                    assert.hasAllKeys(res.body.contacts[0], ['_id', 'person', 'demo', 'gen_interest', 'spec_interests', 'user_type']);
                 })
                 .catch((err) => {
                     assert.fail(err);

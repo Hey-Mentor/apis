@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const db_util = require('../tests/db_util');
+const db_util = require('../tools/db_util');
 
 const connectionString = process.env.TEST_CONNECTION_STRING;
 

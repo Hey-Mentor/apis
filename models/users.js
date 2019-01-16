@@ -43,6 +43,10 @@ const UserSchema = new Schema({
     },
     demo: {
         race: { type: String },
+        gender: {
+            type: String,
+            enum: ['male', 'female', 'nonbinary', 'other'],
+        },
         eth: { type: String },
     },
     school: {
