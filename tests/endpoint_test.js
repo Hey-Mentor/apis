@@ -11,8 +11,6 @@ const db_util = require('../tools/db_util');
 
 const app = require('../server');
 
-// During the test the env variable is set to test
-
 mongoose.connect(process.env.TEST_CONNECTION_STRING, { useNewUrlParser: true });
 
 const assert = chai.assert;
