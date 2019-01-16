@@ -21,23 +21,15 @@ The project contains the API surface that supports the following Hey Mentor proj
 
     npm install mongoose
 
-## Running the backend
+## Deploying locally
 
-In the `/api` directory, run:
+`npm run start`
 
-    node server.js
+## Testing
 
-## Testing the backend
+Once you correctly have Mongoose running locally on your machine (following the instructions below) you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing.
 
-The backend datastore contains mentees with the following matched mentor IDs:
-
-* bdkenslvl
-
-* enslbbale
-
-* elksvneks
-
-* none
+Before submitting changes, run the test suite locally via `npm run test`
 
 ## Running Against a Local Database
 
@@ -83,10 +75,6 @@ You can set up your own deployment by following these steps:
 
 In order to execute these tests, you will need to have a valid test user access token for the Facebook app. You can get an access token by navigating to the [Facebook app portal](https://developers.facebook.com/apps/1650628351692070/roles/test-users/) and clicking "Edit" > "Get an access token for this test user".
 
-10. __Running with SendBird:__ In order to run the SendBird APIs, you will need to configure a SendBird application (or ask other devs for an existing one). You will then need to execute the server with an environment variable containing the SendBird API key. 
-
-To do this on Windows, you can run:  `$env:sendbirdkey="<SECRET>"; node server.js`
-
 
 # API Surface
 
@@ -94,33 +82,22 @@ To do this on Windows, you can run:  `$env:sendbirdkey="<SECRET>"; node server.j
 
 __Endpoint__: `/register/<facebook||google>?access_token=<token>`
 
-Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate to the API.
-
-Additionally, the identity token is used by the mobile application to determine app behavior, such as whether to present the "Mentor" or "Mentee" UI flow.
+Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate against the API.
 
 Response: Identity Token, User ID, or Error
+
+#### All of the following calls require a registered API access token 
 
 
 __Endpoint__: `/profile/:userId?token=<token>`
 
-Gets the user data of the given user. The token must be a Hey Mentor Identity token.
+Gets the user data of the given user.
 
-Note: a user is only allowed to access his/her own profile data, or the profile data of a related user (the user's mentees or mentor)
+Response: User profile details,  or Error
 
-Response: User profile details, or Error
+__Endpoint__: `/contacts/:userId?token=<token>`
 
+Gets the public contact info of the users contacts.
 
-__Endpoint__: `/me/:userId?token=<token>`
+Response: User contact info,  or Error
 
-Gets the user data of the current user. The token must be a Hey Mentor Identity token.
-
-Note: a user is only allowed to access his/her own profile data, or the profile data of a related user (the user's mentees or mentor)
-
-Response: User profile details, or Error
-
-
-__Endpoint__: `/messages/:userId?token=<token>`
-
-Gets the messages between the current user and the user specified by `userId`. The token must be a Hey Mentor Identity token.
-
-Response: Messages, or Error
