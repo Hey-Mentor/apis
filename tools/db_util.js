@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const faker = require('faker');
 const Promise = require('bluebird');
+const logger = require('../logging/logger');
 
 require('dotenv').config();
 
@@ -58,18 +59,19 @@ User.schema.eachPath((path) => {
 
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
-    return User.deleteMany({}).then(() => {
-        User.insertMany(fake_users.slice(1))
-            .then(users => users.map(user => user._id))
-            .then((user_ids) => {
-                const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
-                    contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
-                }));
-                ops.push(User.create(Object.assign(fake_users[0], {
-                    contacts: user_ids.map(user => user._id),
-                    _id: process.env.TEST_USER_ID,
-                })));
-                return Promise.all(ops);
-            });
-    });
+    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(1))
+        .then(users => users.map(user => user._id))
+        .then((user_ids) => {
+            const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
+                contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
+            }));
+            ops.push(User.create(Object.assign(fake_users[0], {
+                contacts: user_ids.map(user => user._id),
+                _id: process.env.TEST_USER_ID,
+            })));
+            return Promise.all(ops);
+        })
+        .catch((err) => {
+            logger.error(err);
+        }));
 };
