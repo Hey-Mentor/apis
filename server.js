@@ -7,8 +7,6 @@ const { logger } = require('./logging/logger');
 const app = express();
 const port = process.env.PORT || 8081;
 
-mongoose.set('debug', true);
-
 // mongoose instance connection url connection
 mongoose.Promise = require('bluebird');
 require('./models/users');
