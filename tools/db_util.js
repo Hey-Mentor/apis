@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const faker = require('faker');
+const uuid = require('uuid/v4');
 const Promise = require('bluebird');
-const logger = require('../logging/logger');
+const { logger } = require('../logging/logger');
 
 require('dotenv').config();
 
@@ -13,7 +14,7 @@ const fake_users = new Array(10).fill().map(() => ({
     user_type: faker.random.arrayElement(['mentor', 'mentee']),
     facebook_id: faker.random.alphaNumeric(20),
     google_id: faker.random.alphaNumeric(20),
-    api_key: process.env.TEST_API_KEY,
+    api_key: uuid().replace(/-/g, ''),
     contacts: [],
     person: {
         fname: faker.name.firstName(),
@@ -59,7 +60,7 @@ User.schema.eachPath((path) => {
 
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
-    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(1))
+    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
@@ -67,8 +68,18 @@ module.exports.populateDB = function () {
             }));
             ops.push(User.create(Object.assign(fake_users[0], {
                 contacts: user_ids.map(user => user._id),
-                _id: process.env.TEST_USER_ID,
+                user_type: 'mentor',
+                api_key: process.env.TEST_MENTOR_API_KEY,
+                _id: process.env.TEST_MENTOR_USER_ID,
             })));
+
+            ops.push(User.create(Object.assign(fake_users[1], {
+                contacts: user_ids.map(user => user._id),
+                user_type: 'mentee',
+                api_key: process.env.TEST_MENTEE_API_KEY,
+                _id: process.env.TEST_MENTEE_USER_ID,
+            })));
+
             return Promise.all(ops);
         })
         .catch((err) => {

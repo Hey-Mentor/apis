@@ -28,6 +28,7 @@ const UserSchema = new Schema({
     contacts: {
         type: [{
             type: Schema.Types.ObjectId,
+            ref: 'User',
         }],
     },
     person: {
