@@ -21,23 +21,15 @@ The project contains the API surface that supports the following Hey Mentor proj
 
     npm install mongoose
 
-## Running the backend
+## Deploying locally
 
-In the `/api` directory, run:
+`npm run start`
 
-    node server.js
+## Testing
 
-## Testing the backend
+Once you correctly have Mongoose running locally on your machine (following the instructions below) you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing.
 
-The backend datastore contains mentees with the following matched mentor IDs:
-
-* bdkenslvl
-
-* enslbbale
-
-* elksvneks
-
-* none
+Before submitting changes, run the test suite locally via `npm run test`
 
 ## Running Against a Local Database
 
@@ -88,35 +80,24 @@ In order to execute these tests, you will need to have a valid test user access 
 
 ## Mobile App API Surface
 
-__Endpoint__: `/token/:fedToken/:authType`
+__Endpoint__: `/register/<facebook||google>?access_token=<token>`
 
-Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate to the API.
+Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate against the API.
 
-Additionally, the identity token is used by the mobile application to determine app behavior, such as whether to present the "Mentor" or "Mentee" UI flow.
+Response: Identity Token, User ID, or Error
 
-Response: Identity Token, or Error
-
-
-__Endpoint__: `/profile/:userId/:token`
-
-Gets the user data of the given user. The token must be a Hey Mentor Identity token.
-
-Note: a user is only allowed to access his/her own profile data, or the profile data of a related user (the user's mentees or mentor)
-
-Response: User profile details, or Error
+#### All of the following calls require a registered API access token 
 
 
-__Endpoint__: `/me/:token`
+__Endpoint__: `/profile/:userId?token=<token>`
 
-Gets the user data of the current user. The token must be a Hey Mentor Identity token.
+Gets the user data of the given user.
 
-Note: a user is only allowed to access his/her own profile data, or the profile data of a related user (the user's mentees or mentor)
+Response: User profile details,  or Error
 
-Response: User profile details, or Error
+__Endpoint__: `/contacts/:userId?token=<token>`
 
+Gets the public contact info of the users contacts.
 
-__Endpoint__: `/messages/:userId/:token`
+Response: User contact info,  or Error
 
-Gets the messages between the current user and the user specified by `userId`. The token must be a Hey Mentor Identity token.
-
-Response: Messages, or Error

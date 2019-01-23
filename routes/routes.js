@@ -1,32 +1,45 @@
-'use strict';
+const passport = require('passport');
+const router = require('express').Router();
 
-module.exports = function(app) {
-    var mentorController = require('../controllers/mentorController');
+const messageController = require('../controllers/message');
+const registerController = require('../controllers/register');
+const profileController = require('../controllers/profile');
+const auth = require('../middleware/auth');
+const error = require('../middleware/error');
 
 // --------------------------------------------------------
 //
 // TODO: Only deploy "unsecure" versions in PPE, and not PROD
 //
+/*
     app.route('/unsecure/user/:userId')
-        .get(mentorController.get_profile_data_unsecure);
+        .get(profileController.getProfileDataUnsecure);
 
     app.route('/fbaccess')
-        .get(mentorController.print_facebook_token);
-
+        .get(profileController.printFacebookToken);
+    */
 // --------------------------------------------------------
 
-    app.route('/token/:fedToken/:authType')
-        .get(mentorController.get_id_token);
+router.post('/register/facebook', passport.authenticate('facebook-token', { session: false }),
+    registerController.register);
 
-    app.route('/profile/:userId/:token')
-        .get(mentorController.get_profile_data);
+router.post('/register/google', passport.authenticate('google-token', { session: false }),
+    registerController.register);
 
-    app.route('/me/:token')
-        .get(mentorController.get_my_profile_data);
+router.use('/*/:userId', auth.authorize);
 
-    app.route('/messages/:userId/:token')
-        .get(mentorController.get_messages);
+router.route('/profile/:userId')
+    .get(profileController.getProfileData);
 
-/*    app.route('/notifications/:userId/:token')
-        .get(mentorController.get_notifications);*/
-};
+router.route('/contacts/:userId')
+    .get(profileController.getContacts);
+
+router.route('/messages/:userId')
+    .get(messageController.getMessages);
+
+/*    router.route('/notifications/:userId/:token')
+            .get(mentorController.get_notifications); */
+
+router.use(error.error);
+
+module.exports = router;

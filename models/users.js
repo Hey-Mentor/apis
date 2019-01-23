@@ -1,39 +1,75 @@
-'use strict';
+const mongoose = require('mongoose');
 
-var mongoose = require('mongoose');
-var Schema = mongoose.Schema;
+const Schema = mongoose.Schema;
 
-var UserSchema = new Schema({
-    user_id: { type: String },
-    user_type: { type: String },
-    facebook_id: { type: String },
-    google_id: { type: String },
-    contacts: { type:[{type:String}]},
+const UserSchema = new Schema({
+    user_type: {
+        type: String,
+        enum: ['mentor', 'mentee'],
+        required: true,
+    },
+    facebook_id: {
+        type: String,
+        required() {
+            return !this.google_id;
+        },
+        unique: true,
+    },
+    google_id: {
+        type: String,
+        required() {
+            return !this.facebook_id;
+        },
+        unique: true,
+    },
+    api_key: {
+        type: String,
+    },
+    contacts: {
+        type: [{
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+        }],
+    },
     person: {
-        fname: { type: String },
-        lname: { type: String },
+        fname: {
+            type: String,
+            required: true,
+        },
+        lname: {
+            type: String,
+            required: true,
+        },
         kname: { type: String },
     },
     demo: {
-        gender: { type: String },
         race: { type: String },
-        eth: { type: String }
+        gender: {
+            type: String,
+            enum: ['male', 'female', 'nonbinary', 'other'],
+        },
+        eth: { type: String },
     },
     school: {
         name: { type: String },
-        grade: { type: String },
-        gpa: { type: String },
-        sat: { type: String }
+        grade: { type: Number },
+        gpa: { type: Number },
+        sat: { type: Number },
     },
-    gen_interest: { type: String },
-    spec_interests: {type: Array },
-    sports: {type: Array },
-    support: {type: Array }
+    gen_interest: {
+        type: String,
+    },
+    spec_interests: {
+        type: Array,
+    },
+    sports: {
+        type: Array,
+    },
+    support: { type: Array },
 },
 {
-    collection: "Users"
+    // NOTE: The 'collection' field here must match the "Collection" on the backend
+    collection: 'Users',
 });
 
-// NOTE: The 'collection' field here must match the "Collection" on the backend
-
-module.exports = mongoose.model('Users', UserSchema);
+module.exports = mongoose.model('User', UserSchema);

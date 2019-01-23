@@ -1,40 +1,46 @@
-var express = require('express'),
-    app = express(),
-    port = process.env.PORT || 3002,
-    mongoose = require('mongoose'),
-    Users = require('./models/users'),
-    bodyParser = require('body-parser');
+require('dotenv').config();
+const express = require('express');
+const bodyParser = require('body-parser');
+const mongoose = require('mongoose');
+const { logger } = require('./logging/logger');
+
+const app = express();
+const port = process.env.PORT || 8081;
 
 // mongoose instance connection url connection
-mongoose.Promise = global.Promise;
+mongoose.Promise = require('bluebird');
+require('./models/users');
 
-//var connectionString = require('./local');
-var connectionString = "mongodb://localhost:27017/HeyMentor";
+const connectionString = process.env.NODE_ENV === 'production'
+    ? process.env.CONNECTION_STRING
+    : process.env.TEST_CONNECTION_STRING;
+
 mongoose.connect(connectionString, { useNewUrlParser: true });
 
-//var connectionString = process.env.CONNECTION_STRING;
-//mongoose.connect(connectionString);
-
 // Handle the connection event
-var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error:'));
+const db = mongoose.connection;
+db.on('error', logger.error.bind(logger, 'connection error:'));
 
-db.once('open', function() {
-    console.log("DB connection alive");
-    var Admin = mongoose.mongo.Admin;
-    new Admin(db.db).listDatabases(function(err, result) {
-        console.log('listDatabases succeeded');
-        var allDatabases = result.databases;
-        console.log(allDatabases);
+db.once('open', () => {
+    logger.info('DB connection alive');
+    const Admin = mongoose.mongo.Admin;
+    new Admin(db.db).listDatabases((err, result) => {
+        logger.info('listDatabases succeeded');
+        const allDatabases = result.databases;
+        logger.info(allDatabases);
     });
 });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-var routes = require('./routes/routes'); //importing route
-routes(app); //register the route
+app.use(require('./routes/routes'));
 
 app.listen(port);
 
-console.log('API server started on port: ' + port);
+logger.info(`API server started on port: ${port}`);
+logger.info(`SendBird secret: ${process.env.sendbirdkey}`);
+// $env:sendbirdkey="<SECRET>"; node server.js
+
+// For testing purposes
+module.exports = app;

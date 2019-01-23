@@ -1,199 +1,145 @@
 const axios = require('axios');
-const port = 3002;
+const port = process.env.port || 8081;
+var app_id = process.env.FACEBOOK_APP_ID;
+var access_token = process.env.TEST_ACCESS_TOKEN;
+var auth_type = process.env.TEST_AUTH_TYPE;
 
+if (!app_id || !port || !access_token || !auth_type){
+    console.log("ERROR RUNNING TESTS: Your environment is not set up with the proper test variables");
+}
 
-var mentee_id = "id7wxwlfpof7920bj0ct";
-var app_id = "1650628351692070";
+/*
+Client Helper Functions 
+*/
+function register_for_api_key(access_token, auth_type){
+    console.log("Testing 'Register for API Key'");
+    return axios.post(`http://localhost:${port}/register/${auth_type}?access_token=${access_token}`)
+    .then(response => {
+        console.log("Got a response");
+        console.log(response);
+        if (response.data){
+            return response.data;
+        }
+    })
+    .catch(error => {
+        console.log(error);
+    });
 
-var access_token = "EAAXdPNyPDSYBAFcBvBhucNymlGu0F0o1NQZBFfdNlOIY2OUZAcjRspgodcdusZAOPAewESjiYnonYMnDSgasFuM3rn2TKpayI4ertj8Q8N2HTUbaw9bMUTnkOytPWN0h8yJoELeamZAqD23ZCjrLc2BlYl4kbhhiZB8PMQuluYRdZBUvzj4T2cG51clXyWy5PmRUEyhPj2TXiAYCWU2x3NCH5iP28MioSl0U4iB029gxQKDJnLdT2Hq";
-var auth_type = "facebook";
+    return null;
+}
+
+function get_user_profile_data(api_key, userId){
+    return axios.get(`http://localhost:${port}/profile/${userId}?token=${api_key}`)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+    return null;
+}
+
+function get_messages(api_key, userId){
+    return axios.get(`http://localhost:${port}/messages/${userId}?token=${api_key}`)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+    });
+
+    return null;
+}
 
 
 /*
+API Helper Functions
+*/
+function create_sendbird_channel(){
+    var userIds = ["mattbo", "joe"];
+    var data = { user_ids: userIds, is_distinct: true}
+    var config = { headers: { "Api-Token": process.env.sendbirdkey}}
 
-To get your facebook access token, navigate to the following URL:
+    return axios.post(`https://api.sendbird.com/v3/group_channels`, data, config)
+    .then(response => {
+        return response.data;
+    })
+    .catch(error => {
+        console.log(error);
+    });
 
-https://www.facebook.com/v3.2/dialog/oauth?client_id=1650628351692070&display=popup&response_type=token&redirect_uri=http://localhost:3002/fbaccess
+    return null;
+}
 
+function test_create_channel(){
+    var channel_data = create_sendbird_channel();
+    channel_data.then( data => {
+        console.log("Channel Response:");
+        console.log(data);
+    });
+}
+
+
+/*
+Client Tests
 */
 
-
-function test_mentee_list_from_mentor() {
-    var mentor_id = "jjksvnevb";
-    axios.get(`http://localhost:${port}/unsecure/mentees/${mentor_id}/`)
-    .then(response => {
-        console.log(response.data);
-        if (response.data[0].mentee_ids && response.data[0].mentee_ids.length > 1 ){
-            console.log("TEST PASSED");
-        }
-    })
-    .catch(error => {
-        console.log(error);
+function test_register_user(){
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
+        console.log("API Key Object:");
+        console.log(api_key);
+        console.log(api_key.api_key)
     });
 }
 
-function test_get_id_token_facebook(){
-    axios.get(`http://localhost:${port}/token/${access_token}/${auth_type}`)
-    .then(response => {
-        if (response.data.fedToken.length > 0 && response.data.authType == "facebook" && response.data.user_type == "mentee" && response.data.user_id.length > 0){
-            console.log(response.data);
-            console.log("TEST PASSED");
-            return response.data;
-        }
-    })
-    .catch(error => {
-        console.log(error);
+function test_get_my_messages(){
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
+        var key = api_key.api_key;
+        var data = get_user_profile_data(key, api_key.user_id);
+        data.then( user_profile => {
+            console.log("Contacts: " + user_profile.contacts[0]);
+
+            var message_req = get_messages(key, user_profile.contacts[0]);
+            message_req.then( channel => {
+                console.log(channel);
+            });
+        });
     });
-}
-
-function get_id_token(access_token, auth_type){
-    console.log("Get ID Token");
-    return axios.get(`http://localhost:${port}/token/${access_token}/${auth_type}`)
-    .then(response => {
-        console.log("Got a response");
-        if (response.data && response.data.fedToken && response.data.fedToken.length > 0 ){
-            return response.data;
-        }
-    })
-    .catch(error => {
-        console.log(error);
-    });
-
-    return null;
-}
-
-
-function get_my_profile_data(id_token){
-    return axios.get(`http://localhost:${port}/me/${id_token}`)
-    .then(response => {
-        return response.data;
-    })
-    .catch(error => {
-        console.log(error);
-    });
-
-    return null;
-}
-
-function get_contact_profile_data(id_token, userId){
-    return axios.get(`http://localhost:${port}/profile/${userId}/${id_token}`)
-    .then(response => {
-        return response.data;
-    })
-    .catch(error => {
-        console.log(error);
-    });
-
-    return null;
 }
 
 function test_get_my_profile(){
-    var id_token = get_id_token(access_token, auth_type);
-    id_token.then( token => {
-        console.log("Token:");
-        console.log(token);
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
 
-        let objJsonStr = JSON.stringify(token);
-        let encoded = Buffer.from(objJsonStr).toString("base64");
-
-        var data = get_my_profile_data(encoded);
+        var data = get_user_profile_data(api_key.api_key, api_key.user_id);
         data.then( user_profile => {
             console.log(user_profile);
-            if (user_profile[0].person.fname == "Larry"){
-                console.log("TEST PASSED");
-            }
         });
     });
 }
 
 function test_get_contact_profile(){
-    var id_token = get_id_token(access_token, auth_type);
-    id_token.then( token => {
-        console.log("Token:");
-        console.log(token);
-
-        let objJsonStr = JSON.stringify(token);
-        let encoded = Buffer.from(objJsonStr).toString("base64");
-
-        var data = get_my_profile_data(encoded);
+    var api_key_obj = register_for_api_key(access_token, auth_type);
+    api_key_obj.then( api_key => {
+        var key = api_key.api_key;
+        var data = get_user_profile_data(key, api_key.user_id);
         data.then( user_profile => {
-            console.log(user_profile);
+            console.log(user_profile.contacts[0]);
 
-            var contact_req = get_contact_profile_data(encoded, user_profile[0].contacts[0]);
+            var contact_req = get_user_profile_data(key, user_profile.contacts[0]);
             contact_req.then( user_profile => {
                 console.log(user_profile);
             });
         });
-
-
     });
 }
 
-function test_user_login_to_facebook() {
-/*    FB.login(function(response) {
-        if (response.authResponse) {
-            console.log('Welcome!  Fetching your information.... ');
-            FB.api('/me', function(response) {
-                console.log('Good to see you, ' + response.name + '.');
-            });
-        } else {
-            console.log('User cancelled login or did not fully authorize.');
-        }
-    });*/
-
-    //
 
 
-// https://www.facebook.com//login/device-based/regular/login/?login_attempt=1&next=https%3A%2F%2Fwww.facebook.com%2Fv3.2%2Fdialog%2Foauth%3Fredirect_uri%3Dhttp%253A%252F%252Flocalhost%253A3002%26display%3Dpopup%26response_type%3Dtoken%26client_id%3D1650628351692070%26ret%3Dlogin%26logger_id%3D7e86640f-9a60-cd49-cb53-11ef483f200a&popup=1&lwv=100
-// email    xdqakimccj_1542132270@tfbnw.net
-// pass    testuserpass
-
-    axios.get(`https://www.facebook.com/v3.2/dialog/oauth?client_id=${app_id}&display=popup&response_type=token&redirect_uri=http://localhost:${port}/fbaccess}`)
-    .then(response => {
-        //console.log(response.data);
-        var popupS = require('popups');
-
-        popupS.alert({
-            content: response.data
-        });
-
-    })
-    .catch(error => {
-        console.log(error);
-    });
-
-}
-
-
-//test_mentee_list_from_mentor();
-//test_get_id_token_facebook();
+//test_register_user();
 //test_get_my_profile();
-test_get_contact_profile();
-
-/*constructMenteeItemsFromResponse = async (menteeIds, token) => {
-        menteeItems = [];
-
-        for (let mentee of menteeIds) {
-            let response = await fetch(
-                `https://heymentortestdeployment.herokuapp.com/mentees/${mentee}/${token}`
-            );
-            let responseJson = await response.json();
-
-            console.log(responseJson);
-
-            fullName =
-                responseJson[0].person.fname + ' ' + responseJson[0].person.lname;
-            menteeItems.push({
-                name: fullName,
-                school: responseJson[0].school.name,
-                grade: responseJson[0].school.grade,
-                id: responseJson[0].mentee_id,
-                fullMentee: responseJson[0]
-            });
-        }
-
-        this.setState({ menteeItem: menteeItems });
-
-        console.log('mentee items');
-        console.log(menteeItems);
-    };*/
+//test_get_contact_profile();
+test_get_my_messages();
