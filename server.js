@@ -16,8 +16,8 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 
 const connectionString = process.env.NODE_ENV === 'production'
-    ? process.env.CONNECTION_STRING
-    : process.env.TEST_CONNECTION_STRING;
+    ? process.env.DB_URL
+    : process.env.TEST_DB_URL;
 
 mongoose.connect(connectionString, { useNewUrlParser: true });
 
