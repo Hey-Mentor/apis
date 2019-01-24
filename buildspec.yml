@@ -1,8 +1,10 @@
-language: node_js
-node_js:
-  - 10
-install:
-  - npm install
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - nvm install 10
+      - npm install
 artifacts:
   files:
     - '**/*'
