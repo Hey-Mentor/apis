@@ -3,7 +3,6 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - nvm install 10
       - npm install
 artifacts:
   files:
