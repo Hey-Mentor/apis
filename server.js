@@ -39,8 +39,6 @@ app.use(require('./routes/routes'));
 app.listen(port);
 
 logger.info(`API server started on port: ${port}`);
-logger.info(`SendBird secret: ${process.env.sendbirdkey}`);
-// $env:sendbirdkey="<SECRET>"; node server.js
 
 // For testing purposes
 module.exports = app;
