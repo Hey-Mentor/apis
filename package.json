@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": " eslint . && mocha ./tests --exit",
+    "test": " eslint . && mocha 'test/**/index.js' --exit",
     "db:populate": "node ./scripts/populate_db.js",
     "start": "nodemon server.js"
   },

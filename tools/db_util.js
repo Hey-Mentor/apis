@@ -1,11 +1,9 @@
+require('dotenv').config();
 const mongoose = require('mongoose');
 const faker = require('faker');
 const uuid = require('uuid/v4');
 const Promise = require('bluebird');
 const { logger } = require('../logging/logger');
-
-require('dotenv').config();
-
 require('../models/users');
 
 const User = mongoose.model('User');

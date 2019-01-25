@@ -10,7 +10,8 @@
     "prefer-destructuring": 0,
     "no-underscore-dangle": 0,
     "func-names": 0,
-    "no-param-reassign": 0
+    "no-param-reassign": 0,
+    "no-console": 2
   },
   "parserOptions": {
     "ecmaVersion": 2017
