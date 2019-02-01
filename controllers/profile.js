@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 
-const Users = mongoose.model('User');
-
 const { logger } = require('../logging/logger');
+
+const Users = mongoose.model('User');
 
 
 // WARNING any schema properties in this object will be exposed to other clients,
