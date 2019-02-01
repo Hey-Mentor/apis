@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const { logger } = require('../logging/logger');
 
 const User = mongoose.model('User');

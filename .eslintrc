@@ -3,6 +3,10 @@
     "eslint:recommended",
     "airbnb-base"
   ],
+  "plugins": [
+    "import",
+    "sort-requires"
+  ],
   "rules": {
     "indent": [ "error", 4, { "SwitchCase": 1 } ],
     "linebreak-style": [ 0 ],
@@ -11,7 +15,17 @@
     "no-underscore-dangle": 0,
     "func-names": 0,
     "no-param-reassign": 0,
-    "no-console": 2
+    "no-console": 2,
+    "global-require": 2,
+    "import/no-unresolved": 2,
+    "import/newline-after-import": 2,
+    "import/order": ["error", {"newlines-between": "always", "groups": ["builtin", "external", "internal"]}],
+    "import/no-dynamic-require": 2,
+    "import/no-self-import": 2,
+    "import/no-useless-path-segments": 2,
+    "import/no-duplicates": 2,
+    "import/no-absolute-path": 2,
+    "sort-requires/sort-requires": 2
   },
   "parserOptions": {
     "ecmaVersion": 2017

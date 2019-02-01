@@ -1,8 +1,9 @@
 require('dotenv').config();
-const mongoose = require('mongoose');
 const faker = require('faker');
-const uuid = require('uuid/v4');
+const mongoose = require('mongoose');
 const Promise = require('bluebird');
+const uuid = require('uuid/v4');
+
 const { logger } = require('../logging/logger');
 require('../models/users');
 
