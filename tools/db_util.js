@@ -15,6 +15,8 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     contacts: [],
+    chat_token: '',
+    channels: [],
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),

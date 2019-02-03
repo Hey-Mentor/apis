@@ -17,7 +17,7 @@ const PUBLIC_CONTACT_SCHEMA = {
     school: 1,
 };
 
-exports.getProfileData = function (req, res) {
+exports.getProfile = function (req, res) {
     return Users.findById(req.user._id, { api_key: 0 })
         .then(user => res.json(user))
         .catch((err) => {
