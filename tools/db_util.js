@@ -15,6 +15,8 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     contacts: [],
+    chat_token: '',
+    channels: [],
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
@@ -66,14 +68,14 @@ module.exports.populateDB = function () {
                 contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
             }));
             ops.push(User.create(Object.assign(fake_users[0], {
-                contacts: user_ids.map(user => user._id),
+                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
                 user_type: 'mentor',
                 api_key: process.env.TEST_MENTOR_API_KEY,
                 _id: process.env.TEST_MENTOR_USER_ID,
             })));
 
             ops.push(User.create(Object.assign(fake_users[1], {
-                contacts: user_ids.map(user => user._id),
+                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTOR_USER_ID]),
                 user_type: 'mentee',
                 api_key: process.env.TEST_MENTEE_API_KEY,
                 _id: process.env.TEST_MENTEE_USER_ID,

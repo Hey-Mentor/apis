@@ -17,7 +17,7 @@ const PUBLIC_CONTACT_SCHEMA = {
     school: 1,
 };
 
-exports.getProfileData = function (req, res) {
+exports.getProfile = function (req, res) {
     return res.status(200).json(req.user);
 };
 

@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const uuid = require('uuid/v4');
 
+const TwilioUtil = require('../util/twilio');
 const { logger } = require('../logging/logger');
 
 const User = mongoose.model('User');
@@ -22,6 +23,7 @@ const REGISTER_SCHEMA = {
     api_key: 1,
     _id: 1,
     user_type: 1,
+    chat_token: 1,
 };
 
 passport.use(new FacebookTokenStrategy({
@@ -35,8 +37,7 @@ passport.use(new FacebookTokenStrategy({
 passport.use(new GoogleTokenStrategy({
     clientID: GOOGLE_APP_ID,
     clientSecret: '',
-},
-((accessToken, refreshToken, profile, done) => {
+}, ((accessToken, refreshToken, profile, done) => {
     profile.authType = AUTH_TYPES.GOOGLE;
     return done(null, profile);
 })));
@@ -55,14 +56,13 @@ passport.use(new GoogleTokenStrategy({
 
 */
 exports.register = function (req, res) {
-    logger.info('Register');
     const api_key = uuid().replace(/-/g, '');
-
     switch (req.user.authType) {
         case AUTH_TYPES.FACEBOOK:
             User.find({ facebook_id: req.user.id })
                 .then((user) => {
-                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key }, {
+                    const chat_token = TwilioUtil.TokenGenerator(req.user.id);
+                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key, chat_token }, {
                         new: true,
                         select: REGISTER_SCHEMA,
                         strict: true,
@@ -72,8 +72,9 @@ exports.register = function (req, res) {
                             logger.error(err);
                             res.status(400).send('Found user but could not update');
                         });
-                }).catch((err) => {
-                    logger.info(err);
+                })
+                .catch((err) => {
+                    logger.error(err);
                     res.status(400).send('Could not find user');
                 });
             break;
