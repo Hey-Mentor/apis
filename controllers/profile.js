@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+
 const { logger } = require('../logging/logger');
 
 const Users = mongoose.model('User');
+
 
 // WARNING any schema properties in this object will be exposed to other clients,
 // do not put sensitive schema properties in this object

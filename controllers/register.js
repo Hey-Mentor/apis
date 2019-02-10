@@ -1,11 +1,12 @@
-const uuid = require('uuid/v4');
-const passport = require('passport');
-const mongoose = require('mongoose');
-
-const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const mongoose = require('mongoose');
+const passport = require('passport');
+const uuid = require('uuid/v4');
+
 const { logger } = require('../logging/logger');
+
+const User = mongoose.model('User');
 
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;

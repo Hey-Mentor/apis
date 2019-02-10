@@ -1,24 +1,10 @@
 const passport = require('passport');
 const router = require('express').Router();
 
-const messageController = require('../controllers/message');
-const registerController = require('../controllers/register');
-const profileController = require('../controllers/profile');
 const auth = require('../middleware/auth');
 const error = require('../middleware/error');
-
-// --------------------------------------------------------
-//
-// TODO: Only deploy "unsecure" versions in PPE, and not PROD
-//
-/*
-    app.route('/unsecure/user/:userId')
-        .get(profileController.getProfileDataUnsecure);
-
-    app.route('/fbaccess')
-        .get(profileController.printFacebookToken);
-    */
-// --------------------------------------------------------
+const profileController = require('../controllers/profile');
+const registerController = require('../controllers/register');
 
 router.post('/register/facebook', passport.authenticate('facebook-token', { session: false }),
     registerController.register);
@@ -33,12 +19,6 @@ router.route('/profile/:userId')
 
 router.route('/contacts/:userId')
     .get(profileController.getContacts);
-
-router.route('/messages/:userId')
-    .get(messageController.getMessages);
-
-/*    router.route('/notifications/:userId/:token')
-            .get(mentorController.get_notifications); */
 
 router.use(error.error);
 

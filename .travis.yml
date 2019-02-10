@@ -1,6 +1,10 @@
 language: node_js
 node_js: node
 services: mongodb
+
+notifications:
+ slack: hey-mentor:sdMOV1mJqs3S2yRPbWwunnor
+
 env: 
   - NODE_ENV=test
 

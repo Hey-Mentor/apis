@@ -1,9 +1,10 @@
 /* eslint-env mocha */
 require('dotenv').config();
 const mongoose = require('mongoose');
-const profileTests = require('./profile_test');
+
 const contactTests = require('./contact_test');
 const db_util = require('../tools/db_util');
+const profileTests = require('./profile_test');
 
 process.env.NODE_ENV = 'test';
 
