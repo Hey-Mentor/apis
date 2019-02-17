@@ -12,10 +12,18 @@ const request = chai.request(app).keepOpen();
 
 module.exports = function () {
     it('/token should create a chat token', async function () {
-        const res = await request.post(`/chat/token/${process.env.TEST_MENTEE_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`);
+        const res = await request.post(`/chat/token/${process.env.TEST_MENTEE_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`)
+            .send({
+                device: 'test',
+            });
         assert.equal(res.status, 200);
         assert.typeOf(res.body, 'object');
         assert.typeOf(res.body.chat_token, 'string');
         assert.typeOf(res.body._id, 'string');
+    });
+
+    it('/token should reject a request without a device', async function () {
+        const res = await request.post(`/chat/token/${process.env.TEST_MENTEE_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`);
+        assert.equal(res.status, 400);
     });
 };
