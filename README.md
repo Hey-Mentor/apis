@@ -72,14 +72,20 @@ Response: Identity Token, User ID, or Error
 #### All of the following calls require a registered API access token 
 
 
-__Endpoint__: `/profile/:userId?token=<token>`
+__Endpoint__: `GET /profile/:userId?token=<token>`
 
 - Gets the user data of the given user.
 
-__Endpoint__: `/contacts/:userId?token=<token>`
+__Endpoint__: `GET /contacts/:userId?token=<token>`
 
 - Gets the public contact info of the users contacts.
 
-__Endpoint__: `/chat/token/:userId?token=<token>`
+__Endpoint__: `POST /chat/token/:userId?token=<token>`
 
+Body: 
+```
+{
+    device: <client device>
+}
+```
 - Generates a Twilio chat token for client side chat
