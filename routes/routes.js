@@ -18,12 +18,12 @@ router.post('/register/google', passport.authenticate('google-token', { session:
 
 /**
  *
- * ALL OTHER ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE
+ * ALL SECURE ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE
  *
  * */
 router.use('/*/:userId', auth.authorize);
 
-/** ****************PLACE OTHER ROUTING BELOW******************* */
+/** ****************PLACE OTHER ROUTES BELOW******************* */
 
 router.route('/profile/:userId')
     .get(profileController.getProfile);
@@ -31,8 +31,8 @@ router.route('/profile/:userId')
 router.route('/contacts/:userId')
     .get(profileController.getContacts);
 
-router.route('/chat/:userId')
-    .post(chatController.createChat);
+router.route('/chat/token/:userId')
+    .post(chatController.createToken);
 
 router.all('*', (req, res) => {
     res.status(404).send();
