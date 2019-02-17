@@ -1,5 +1,6 @@
 /* eslint-env mocha */
 const chai = require('chai');
+
 chai.use(require('chai-http'));
 
 const app = require('../server');
@@ -10,12 +11,11 @@ const request = chai.request(app).keepOpen();
 /* eslint-disable prefer-arrow-callback */
 
 module.exports = function () {
-    it('should GET a users profile', async function () {
-        const res = await request.get(`/profile/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTOR_API_KEY}`);
+    it('/token should create a chat token', async function () {
+        const res = await request.post(`/chat/token/${process.env.TEST_MENTEE_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`);
         assert.equal(res.status, 200);
         assert.typeOf(res.body, 'object');
-        assert.typeOf(res.body.contacts, 'array');
+        assert.typeOf(res.body.chat_token, 'string');
         assert.typeOf(res.body._id, 'string');
-        assert.exists(res.body.facebook_id || res.body.google_id);
     });
 };

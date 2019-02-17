@@ -8,7 +8,7 @@ exports.authorize = function (req, res, next) {
     User.findOne({ _id: req.params.userId, api_key: req.query.token }, { api_key: 0 })
         .then((user) => {
             if (!user) {
-                throw new Error();
+                return res.status(401).send('Unauthorized');
             }
             req.user = user;
             return next();
