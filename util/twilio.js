@@ -1,10 +1,11 @@
 const twilio = require('twilio');
 
-exports.TokenGenerator = function (identity) {
-    const AccessToken = twilio.jwt.AccessToken;
-    const ChatGrant = AccessToken.ChatGrant;
+const AccessToken = twilio.jwt.AccessToken;
+const ChatGrant = AccessToken.ChatGrant;
+
+exports.TokenGenerator = function (identity, deviceID) {
     // Create a unique ID for the client on their current device
-    const endpointId = `TwilioChat:${identity}`;
+    const endpointId = `TwilioChat:${identity}:${deviceID}`;
 
     // Create a "grant" which enables a client to use Chat as a given user,
     // on a given device

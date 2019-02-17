@@ -4,7 +4,6 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const uuid = require('uuid/v4');
 
-const TwilioUtil = require('../util/twilio');
 const { logger } = require('../logging/logger');
 
 const User = mongoose.model('User');
@@ -23,7 +22,6 @@ const REGISTER_SCHEMA = {
     api_key: 1,
     _id: 1,
     user_type: 1,
-    chat_token: 1,
 };
 
 passport.use(new FacebookTokenStrategy({
@@ -61,21 +59,20 @@ exports.register = function (req, res) {
         case AUTH_TYPES.FACEBOOK:
             User.find({ facebook_id: req.user.id })
                 .then((user) => {
-                    const chat_token = TwilioUtil.TokenGenerator(req.user.id);
-                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key, chat_token }, {
+                    User.findOneAndUpdate({ _id: user[0]._id }, { api_key }, {
                         new: true,
                         select: REGISTER_SCHEMA,
                         strict: true,
                     })
                         .then(updated_user => res.status(201).send(updated_user))
                         .catch((err) => {
-                            logger.error(err);
-                            res.status(400).send('Found user but could not update');
+                            logger.error('Found user but could not update', err);
+                            res.status(400).send('Operation failed');
                         });
                 })
                 .catch((err) => {
-                    logger.error(err);
-                    res.status(400).send('Could not find user');
+                    logger.error('Could not find user', err);
+                    res.status(400).send('Operation failed');
                 });
             break;
         case AUTH_TYPES.GOOGLE:
