@@ -66,7 +66,7 @@ exports.facebookRegister = function (req, res) {
 };
 
 exports.facebookLogin = function (req, res) {
-    User.find({ facebook_id: req.user.id }, REGISTER_SCHEMA)
+    User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA)
         .then(user => res.json(user))
         .catch((err) => {
             logger.error('Could not find user', err);
