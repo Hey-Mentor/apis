@@ -1,5 +1,13 @@
 language: node_js
-node_js:
-  - 10
-install:
-  - npm install
+node_js: node
+services: mongodb
+
+notifications:
+ slack: hey-mentor:sdMOV1mJqs3S2yRPbWwunnor
+
+env: 
+  - NODE_ENV=test
+
+install: npm install
+
+script: npm test

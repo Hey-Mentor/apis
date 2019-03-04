@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
+
 const { logger } = require('../logging/logger');
 
 const Users = mongoose.model('User');
+
 
 // WARNING any schema properties in this object will be exposed to other clients,
 // do not put sensitive schema properties in this object
@@ -16,8 +18,7 @@ const PUBLIC_CONTACT_SCHEMA = {
     school: 1,
 };
 
-exports.getProfileData = function (req, res) {
-    logger.info('getProfileData');
+exports.getProfile = function (req, res) {
     return res.status(200).json(req.user);
 };
 

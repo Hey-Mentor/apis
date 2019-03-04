@@ -1,24 +1,11 @@
 const passport = require('passport');
 const router = require('express').Router();
 
-const messageController = require('../controllers/message');
-const registerController = require('../controllers/register');
-const profileController = require('../controllers/profile');
 const auth = require('../middleware/auth');
+const chatController = require('../controllers/chat');
 const error = require('../middleware/error');
-
-// --------------------------------------------------------
-//
-// TODO: Only deploy "unsecure" versions in PPE, and not PROD
-//
-/*
-    app.route('/unsecure/user/:userId')
-        .get(profileController.getProfileDataUnsecure);
-
-    app.route('/fbaccess')
-        .get(profileController.printFacebookToken);
-    */
-// --------------------------------------------------------
+const profileController = require('../controllers/profile');
+const registerController = require('../controllers/register');
 
 router.post('/register/facebook', passport.authenticate('facebook-token', { session: false }),
     registerController.register);
@@ -26,19 +13,27 @@ router.post('/register/facebook', passport.authenticate('facebook-token', { sess
 router.post('/register/google', passport.authenticate('google-token', { session: false }),
     registerController.register);
 
+/**
+ *
+ * ALL SECURE ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE
+ *
+ * */
 router.use('/*/:userId', auth.authorize);
 
+/** ****************PLACE OTHER ROUTES BELOW******************* */
+
 router.route('/profile/:userId')
-    .get(profileController.getProfileData);
+    .get(profileController.getProfile);
 
 router.route('/contacts/:userId')
     .get(profileController.getContacts);
 
-router.route('/messages/:userId')
-    .get(messageController.getMessages);
+router.route('/chat/token/:userId')
+    .post(chatController.createToken);
 
-/*    router.route('/notifications/:userId/:token')
-            .get(mentorController.get_notifications); */
+router.all('*', (req, res) => {
+    res.status(404).send();
+});
 
 router.use(error.error);
 

@@ -1,11 +1,12 @@
-const uuid = require('uuid/v4');
-const passport = require('passport');
-const mongoose = require('mongoose');
-
-const User = mongoose.model('User');
 const FacebookTokenStrategy = require('passport-facebook-token');
 const GoogleTokenStrategy = require('passport-google-token').Strategy;
+const mongoose = require('mongoose');
+const passport = require('passport');
+const uuid = require('uuid/v4');
+
 const { logger } = require('../logging/logger');
+
+const User = mongoose.model('User');
 
 const FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID;
 const FACEBOOK_CLIENT_SECRET = process.env.FACEBOOK_CLIENT_SECRET;
@@ -34,8 +35,7 @@ passport.use(new FacebookTokenStrategy({
 passport.use(new GoogleTokenStrategy({
     clientID: GOOGLE_APP_ID,
     clientSecret: '',
-},
-((accessToken, refreshToken, profile, done) => {
+}, ((accessToken, refreshToken, profile, done) => {
     profile.authType = AUTH_TYPES.GOOGLE;
     return done(null, profile);
 })));
@@ -54,9 +54,7 @@ passport.use(new GoogleTokenStrategy({
 
 */
 exports.register = function (req, res) {
-    logger.info('Register');
     const api_key = uuid().replace(/-/g, '');
-
     switch (req.user.authType) {
         case AUTH_TYPES.FACEBOOK:
             User.find({ facebook_id: req.user.id })
@@ -68,12 +66,13 @@ exports.register = function (req, res) {
                     })
                         .then(updated_user => res.status(201).send(updated_user))
                         .catch((err) => {
-                            logger.error(err);
-                            res.status(400).send('Found user but could not update');
+                            logger.error('Found user but could not update', err);
+                            res.status(400).send('Operation failed');
                         });
-                }).catch((err) => {
-                    logger.info(err);
-                    res.status(400).send('Could not find user');
+                })
+                .catch((err) => {
+                    logger.error('Could not find user', err);
+                    res.status(400).send('Operation failed');
                 });
             break;
         case AUTH_TYPES.GOOGLE:

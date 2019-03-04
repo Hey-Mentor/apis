@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
+
 const db_util = require('../tools/db_util');
 
-const connectionString = process.env.TEST_CONNECTION_STRING;
-
-mongoose.connect(connectionString, { useNewUrlParser: true });
+mongoose.connect(process.env.TEST_DB_URL, { useNewUrlParser: true });
 
 const db = mongoose.connection;
 

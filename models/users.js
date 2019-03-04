@@ -31,6 +31,12 @@ const UserSchema = new Schema({
             ref: 'User',
         }],
     },
+    channels: [{
+        channel_id: {
+            type: String,
+        },
+        users: [Schema.Types.ObjectId],
+    }],
     person: {
         fname: {
             type: String,

@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "test": " eslint . && mocha ./tests --exit",
+    "lint": " eslint .",
+    "test": " npm run lint && mocha 'test/**/index.js' --exit",
     "db:populate": "node ./scripts/populate_db.js",
     "start": "nodemon server.js"
   },
@@ -15,7 +16,8 @@
     "eslint": "^5.10.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-google": "^0.11.0",
-    "eslint-plugin-import": "^2.14.0",
+    "eslint-plugin-import": "^2.16.0",
+    "eslint-plugin-sort-requires": "^2.1.0",
     "mocha": "^5.2.0",
     "nodemon": "^1.18.3"
   },
@@ -32,6 +34,7 @@
     "passport-google-token": "^0.1.2",
     "pm2": "^3.2.3",
     "sendbird": "^3.0.90",
+    "twilio": "^3.27.1",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"
   }

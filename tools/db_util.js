@@ -1,11 +1,10 @@
-const mongoose = require('mongoose');
-const faker = require('faker');
-const uuid = require('uuid/v4');
-const Promise = require('bluebird');
-const { logger } = require('../logging/logger');
-
 require('dotenv').config();
+const faker = require('faker');
+const mongoose = require('mongoose');
+const Promise = require('bluebird');
+const uuid = require('uuid/v4');
 
+const { logger } = require('../logging/logger');
 require('../models/users');
 
 const User = mongoose.model('User');
@@ -16,6 +15,7 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     contacts: [],
+    channels: [],
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
@@ -67,14 +67,14 @@ module.exports.populateDB = function () {
                 contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
             }));
             ops.push(User.create(Object.assign(fake_users[0], {
-                contacts: user_ids.map(user => user._id),
+                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
                 user_type: 'mentor',
                 api_key: process.env.TEST_MENTOR_API_KEY,
                 _id: process.env.TEST_MENTOR_USER_ID,
             })));
 
             ops.push(User.create(Object.assign(fake_users[1], {
-                contacts: user_ids.map(user => user._id),
+                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTOR_USER_ID]),
                 user_type: 'mentee',
                 api_key: process.env.TEST_MENTEE_API_KEY,
                 _id: process.env.TEST_MENTEE_USER_ID,
