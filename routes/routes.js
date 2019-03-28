@@ -2,8 +2,8 @@ const passport = require('passport');
 const router = require('express').Router();
 
 const auth = require('../middleware/auth');
-const credentialsController = require('../controllers/credentials');
 const chatController = require('../controllers/chat');
+const credentialsController = require('../controllers/credentials');
 const error = require('../middleware/error');
 const profileController = require('../controllers/profile');
 

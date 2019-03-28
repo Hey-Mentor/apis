@@ -45,7 +45,7 @@ passport.use(new GoogleTokenStrategy({
 */
 
 exports.facebookRegister = function (req, res) {
-    return User.findOne({ facebook_id: req.user.id })
+    return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA)
         .then((user) => {
             const api_key = uuid().replace(/-/g, '');
             return User.findOneAndUpdate({ _id: user._id }, { api_key }, {
@@ -66,10 +66,10 @@ exports.facebookRegister = function (req, res) {
 };
 
 exports.facebookLogin = function (req, res) {
-    User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA)
+    return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA)
         .then(user => res.json(user))
         .catch((err) => {
-            logger.error('Could not find user', err);
+            logger.error('Error occurred during find user', err);
             res.sendStatus(400);
         });
 };

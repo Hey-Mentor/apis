@@ -26,6 +26,6 @@ describe('API Tests', function () {
     describe('Routes', function () {
         describe('/profile', profileTests.bind(this));
         describe('/contacts', contactTests.bind(this));
-    	describe('/chat', chatTests.bind(this));
+        describe('/chat', chatTests.bind(this));
     });
 });
