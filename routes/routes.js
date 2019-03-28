@@ -3,15 +3,18 @@ const router = require('express').Router();
 
 const auth = require('../middleware/auth');
 const chatController = require('../controllers/chat');
+const credentialsController = require('../controllers/credentials');
 const error = require('../middleware/error');
 const profileController = require('../controllers/profile');
-const registerController = require('../controllers/register');
 
 router.post('/register/facebook', passport.authenticate('facebook-token', { session: false }),
-    registerController.register);
+    credentialsController.facebookRegister);
+
+router.get('/login/facebook', passport.authenticate('facebook-token', { session: false }),
+    credentialsController.facebookLogin);
 
 router.post('/register/google', passport.authenticate('google-token', { session: false }),
-    registerController.register);
+    credentialsController.googleRegister);
 
 /**
  *

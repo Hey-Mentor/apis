@@ -17,5 +17,6 @@ module.exports = function () {
         assert.typeOf(res.body.contacts, 'array');
         assert.typeOf(res.body._id, 'string');
         assert.exists(res.body.facebook_id || res.body.google_id);
+        assert.notExists(res.body.api_key);
     });
 };

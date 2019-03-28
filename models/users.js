@@ -9,7 +9,7 @@ const UserSchema = new Schema({
         required: true,
     },
     facebook_id: {
-        type: String,
+        type: Number,
         required() {
             return !this.google_id;
         },

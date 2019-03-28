@@ -5,6 +5,7 @@
   "scripts": {
     "lint": " eslint .",
     "test": " npm run lint && mocha 'test/**/index.js' --exit",
+    "test:watch": " nodemon  --exec 'mocha 'test/**/index.js' --exit'",
     "db:populate": "node ./scripts/populate_db.js",
     "start": "nodemon server.js"
   },

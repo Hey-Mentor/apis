@@ -19,7 +19,12 @@ const PUBLIC_CONTACT_SCHEMA = {
 };
 
 exports.getProfile = function (req, res) {
-    return res.status(200).json(req.user);
+    return Users.findById(req.user._id, { api_key: 0 })
+        .then(user => res.json(user))
+        .catch((err) => {
+            logger.error(err);
+            res.status(500).json({ Error: 'Something went wrong' });
+        });
 };
 
 exports.getContacts = function (req, res) {
