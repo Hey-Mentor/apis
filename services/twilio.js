@@ -13,16 +13,15 @@ exports.TokenGenerator = function (identity, deviceID) {
         serviceSid: process.env.TWILIO_CHAT_SERVICE_SID,
         endpointId,
     });
-
     // Create an access token which we will sign and return to the client,
     // containing the grant we just created
     const token = new AccessToken(
         process.env.TWILIO_ACCOUNT_SID,
-        process.env.TWILIO_API_KEY,
-        process.env.TWILIO_API_SECRET,
+        process.env.TWILIO_CHAT_SERVICE_API_KEY,
+        process.env.TWILIO_ACCOUNT_API_KEY,
     );
-
     token.addGrant(chatGrant);
-    token.identity = `${identity}`;
+    token.identity = identity;
+
     return token.toJwt();
 };
