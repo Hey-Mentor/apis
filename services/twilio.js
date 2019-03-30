@@ -21,7 +21,7 @@ exports.TokenGenerator = function (identity, deviceID) {
         process.env.TWILIO_API_SECRET,
     );
     token.addGrant(chatGrant);
-    token.identity = `${identity}`;
+    token.identity = identity;
 
     return token.toJwt();
 };
