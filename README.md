@@ -12,18 +12,6 @@ The project contains the API surface that supports the following Hey Mentor proj
 
 2. __MongoDB__
 
-## Deploying locally
-
-`npm install`
-
-`npm run start`
-
-## Testing
-
-Once you correctly have Mongoose running locally on your machine (following the instructions below) you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing.
-
-Before submitting changes, run the test suite locally via `npm run test`
-
 ## Deploying a Local Database
 
 You can set up your own deployment by following these steps:
@@ -58,6 +46,19 @@ You can set up your own deployment by following these steps:
 
 9. To test that your deployment is working, run the test suite `npm test`
 
+## Deploying locally
+
+`npm install`
+
+`npm run start`
+
+## Testing
+
+Once you correctly have Mongoose running locally on your machine (following the instructions below) you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing and development work.
+
+Before submitting changes, run the test suite locally via `npm run test`
+
+
 # API Surface
 
 ## Mobile App API Surface
@@ -71,15 +72,20 @@ Response: Identity Token, User ID, or Error
 #### All of the following calls require a registered API access token 
 
 
-__Endpoint__: `/profile/:userId?token=<token>`
+__Endpoint__: `GET /profile/:userId?token=<token>`
 
-Gets the user data of the given user.
+- Gets the user data of the given user.
 
-Response: User profile details,  or Error
+__Endpoint__: `GET /contacts/:userId?token=<token>`
 
-__Endpoint__: `/contacts/:userId?token=<token>`
+- Gets the public contact info of the users contacts.
 
-Gets the public contact info of the users contacts.
+__Endpoint__: `POST /chat/token/:userId?token=<token>`
 
-Response: User contact info,  or Error
-
+Body: 
+```
+{
+    device: <client device>
+}
+```
+- Generates a Twilio chat token for client side chat

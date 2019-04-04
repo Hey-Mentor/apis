@@ -19,16 +19,4 @@ module.exports = function () {
         assert.exists(res.body.facebook_id || res.body.google_id);
         assert.notExists(res.body.api_key);
     });
-
-    it('should reject an incorrect api key', async function () {
-        const res = await request.get(`/profile/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`);
-        assert.equal(res.status, 401);
-        assert.isEmpty(res.body);
-    });
-
-    it('should reject a non-existent user', async function () {
-        const res = await request.get(`/profile/123456789123456789123456?token=${process.env.TEST_MENTOR_API_KEY}`);
-        assert.equal(res.status, 401);
-        assert.isEmpty(res.body);
-    });
 };

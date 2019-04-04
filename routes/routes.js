@@ -2,6 +2,7 @@ const passport = require('passport');
 const router = require('express').Router();
 
 const auth = require('../middleware/auth');
+const chatController = require('../controllers/chat');
 const credentialsController = require('../controllers/credentials');
 const error = require('../middleware/error');
 const profileController = require('../controllers/profile');
@@ -15,13 +16,27 @@ router.get('/login/facebook', passport.authenticate('facebook-token', { session:
 router.post('/register/google', passport.authenticate('google-token', { session: false }),
     credentialsController.googleRegister);
 
+/**
+ *
+ * ALL SECURE ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE
+ *
+ * */
 router.use('/*/:userId', auth.authorize);
 
+/** ****************PLACE OTHER ROUTES BELOW******************* */
+
 router.route('/profile/:userId')
-    .get(profileController.getProfileData);
+    .get(profileController.getProfile);
 
 router.route('/contacts/:userId')
     .get(profileController.getContacts);
+
+router.route('/chat/token/:userId')
+    .post(chatController.createToken);
+
+router.all('*', (req, res) => {
+    res.status(404).send();
+});
 
 router.use(error.error);
 

@@ -66,7 +66,7 @@ module.exports.populateDB = function () {
                 contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
             }));
             ops.push(User.create(Object.assign(fake_users[0], {
-                facebook_id: 123456789,
+                facebook_id: process.env.TEST_FACEBOOK_ID,
                 contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
                 user_type: 'mentor',
                 api_key: process.env.TEST_MENTOR_API_KEY,

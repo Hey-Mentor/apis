@@ -11,16 +11,16 @@ module.exports = function () {
     it('should create an api key for a user with a valid facebook id', async function () {
         let api_key;
         const req = {
-            user: { id: 123456789 },
+            user: { id: process.env.TEST_FACEBOOK_ID },
         };
         const res = {
             status(status) {
                 assert.equal(status, 201);
                 return this;
             },
-            json(foo) {
-                api_key = foo.api_key;
-                return foo;
+            json(user) {
+                api_key = user.api_key;
+                return user;
             },
             sendStatus() {
                 assert.fail();
@@ -36,16 +36,12 @@ module.exports = function () {
     it('should get an api key for a user with a valid facebook id', async function () {
         let api_key;
         const req = {
-            user: { id: 123456789 },
+            user: { id: process.env.TEST_FACEBOOK_ID },
         };
         const res = {
-            status(status) {
-                assert.equal(status, 201);
-                return this;
-            },
-            json(foo) {
-                api_key = foo.api_key;
-                return foo;
+            json(user) {
+                api_key = user.api_key;
+                return user;
             },
             sendStatus() {
                 assert.fail();
