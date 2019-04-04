@@ -20,7 +20,7 @@ module.exports = function () {
             },
             json(user) {
                 api_key = user.api_key;
-                return Promise.resolve(user);
+                return user;
             },
             sendStatus() {
                 assert.fail();
