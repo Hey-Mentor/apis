@@ -34,7 +34,7 @@ const fake_users = new Array(10).fill().map(() => ({
     gen_interest: faker.lorem.sentences(),
     spec_interests: new Array(3).fill().map(() => faker.lorem.words(1)),
     sports: new Array(3).fill().map(() => faker.lorem.words(1)),
-    support: new Array(3).fill().map(() => faker.lorem.words(1)),
+    support: new Array(3).fill().map(() => faker.random.arrayElement(['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'])),
 }));
 
 // Check fake_users has a value for each schema attribute

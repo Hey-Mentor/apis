@@ -22,17 +22,18 @@ module.exports = function () {
 
     it('should update a users profile', async function () {
         let res = await request.get(`/profile/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTOR_API_KEY}`);
-        const gen_interest = res.body.gen_interest;
         assert.equal(res.status, 200);
-        const new_interests = 'new interests';
+        const gen_interest = res.body.gen_interest;
         const update = {
-            gen_interest: new_interests,
+            gen_interest: 'new interests',
+            support: ['college_applications'],
         };
 
         res = await request.put(`/profile/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTOR_API_KEY}`)
             .send({ user: update });
         assert.equal(res.status, 200);
         assert.notEqual(gen_interest, res.body.gen_interest);
-        assert.equal(res.body.gen_interest, new_interests);
+        assert.equal(res.body.gen_interest, update.gen_interest);
+        assert.deepEqual(res.body.support, update.support);
     });
 };

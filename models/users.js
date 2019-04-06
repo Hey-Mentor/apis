@@ -69,6 +69,12 @@ const UserSchema = new Schema({
     sports: {
         type: Array,
     },
+    support: {
+        type: [{
+            type: String,
+            enum: ['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'],
+        }],
+    },
 },
 {
     // NOTE: The 'collection' field here must match the "Collection" on the backend
