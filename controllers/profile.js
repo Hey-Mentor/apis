@@ -18,7 +18,7 @@ const PUBLIC_CONTACT_SCHEMA = {
 };
 
 exports.getProfile = function (req, res) {
-    return Users.findById(req.user._id, { api_key: 0 })
+    return Users.findById(req.user._id, { api_key: 0 }).orFail(new Error())
         .then(user => res.json(user))
         .catch((err) => {
             logger.error(err);
@@ -27,7 +27,7 @@ exports.getProfile = function (req, res) {
 };
 
 exports.getContacts = function (req, res) {
-    Users.findById(req.user._id, { contacts: 1 })
+    Users.findById(req.user._id, { contacts: 1 }).orFail(new Error())
         .populate('contacts', PUBLIC_CONTACT_SCHEMA)
         .then(contacts => res.json(contacts))
         .catch((err) => {
