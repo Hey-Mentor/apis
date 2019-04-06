@@ -14,8 +14,10 @@ exports.getProfile = function (req, res) {
 };
 
 exports.updateProfile = function (req, res) {
-    return Users.findOneAndUpdate(req.user._id, req.body.user).orFail(new Error())
-        .then(user => res.json(user))
+    return Users.findOneAndUpdate(req.user._id, req.body.user, {
+        new: true,
+    }).orFail(new Error())
+        .then(updated_user => res.status(200).json(updated_user))
         .catch((err) => {
             logger.error(err);
             res.status(500).json({ Error: 'Something went wrong' });

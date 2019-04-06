@@ -26,7 +26,8 @@ router.use('/*/:userId', auth.authorize);
 /** ****************PLACE OTHER ROUTES BELOW******************* */
 
 router.route('/profile/:userId')
-    .get(profileController.getProfile);
+    .get(profileController.getProfile)
+    .put(profileController.updateProfile);
 
 router.route('/contacts/:userId')
     .get(profileController.getContacts);
