@@ -107,3 +107,14 @@ Body:
     device: <client device>
 }
 ```
+
+__Endpoint__: `POST /chat/create/:userId?token=<token>`
+
+- Creates a users Twilio account for chat with other users.
+
+Body: 
+```
+{
+    device: <client device>
+}
+```
