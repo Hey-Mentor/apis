@@ -76,11 +76,30 @@ __Endpoint__: `GET /profile/:userId?token=<token>`
 
 - Gets the user data of the given user.
 
+__Endpoint__: `PUT /profile/:userId?token=<token>`
+
+- Update a users profile data
+
+Body: 
+```
+{
+    user: {
+        person: ...
+        demo: ...
+        .
+        .
+        .
+    }
+}
+```
+
 __Endpoint__: `GET /contacts/:userId?token=<token>`
 
 - Gets the public contact info of the users contacts.
 
 __Endpoint__: `POST /chat/token/:userId?token=<token>`
+
+- Generates a Twilio chat token for client side chat
 
 Body: 
 ```
@@ -88,4 +107,3 @@ Body:
     device: <client device>
 }
 ```
-- Generates a Twilio chat token for client side chat

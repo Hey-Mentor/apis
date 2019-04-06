@@ -14,6 +14,7 @@ const UserSchema = new Schema({
             return !this.google_id;
         },
         unique: true,
+        select: false,
     },
     google_id: {
         type: String,
@@ -21,15 +22,18 @@ const UserSchema = new Schema({
             return !this.facebook_id;
         },
         unique: true,
+        select: false,
     },
     api_key: {
         type: String,
+        select: false,
     },
     contacts: {
         type: [{
             type: Schema.Types.ObjectId,
             ref: 'User',
         }],
+        select: false,
     },
     person: {
         fname: {
@@ -65,7 +69,6 @@ const UserSchema = new Schema({
     sports: {
         type: Array,
     },
-    support: { type: Array },
 },
 {
     // NOTE: The 'collection' field here must match the "Collection" on the backend
