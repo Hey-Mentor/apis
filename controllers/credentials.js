@@ -52,7 +52,7 @@ exports.facebookRegister = function (req, res) {
                 new: true,
                 select: REGISTER_SCHEMA,
                 strict: true,
-            })
+            }).orFail(new Error())
                 .then(updated_user => res.status(201).json(updated_user))
                 .catch((err) => {
                     logger.error('Found user but could not update', err);
