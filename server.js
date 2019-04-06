@@ -2,6 +2,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const express = require('express');
 const mongoose = require('mongoose');
+const morgan = require('morgan');
 
 const { logger } = require('./logging/logger');
 require('./models/users');
@@ -31,6 +32,8 @@ db.once('open', () => {
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+
+app.use(morgan('dev'));
 
 app.use(require('./routes/routes'));
 
