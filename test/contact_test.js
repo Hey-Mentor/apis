@@ -19,7 +19,7 @@ module.exports = function () {
         assert.notExists(res.body.contacts[0].api_key);
         assert.typeOf(res.body._id, 'string');
         res.body.contacts.forEach((contact) => {
-            assert.hasAllKeys(contact, ['_id', 'person', 'demo', 'gen_interest', 'spec_interests', 'user_type', 'sports', 'school'], contact);
+            assert.hasAllKeys(contact, ['__v', '_id', 'person', 'demo', 'gen_interest', 'spec_interests', 'user_type', 'sports', 'school', 'support'], contact);
         });
     });
 };
