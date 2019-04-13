@@ -67,7 +67,12 @@ exports.facebookRegister = function (req, res) {
 
 exports.facebookLogin = function (req, res) {
     return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA).orFail(new Error())
-        .then(user => res.json(user))
+        .then((user) => {
+            if (!user.api_key) {
+                return res.status(400).json({ status: 'Must register first' });
+            }
+            return res.json(user);
+        })
         .catch((err) => {
             logger.error('Error occurred during find user', err);
             res.sendStatus(400);
