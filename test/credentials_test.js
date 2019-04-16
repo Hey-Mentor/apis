@@ -11,7 +11,7 @@ module.exports = function () {
     it('should create an api key for a user with a valid facebook id', async function () {
         let api_key;
         const req = {
-            user: { id: process.env.TEST_FACEBOOK_ID },
+            user: { id: process.env.TEST_MENTOR_FACEBOOK_ID },
         };
         const res = {
             status(status) {
@@ -36,7 +36,7 @@ module.exports = function () {
     it('should get an api key for a user with a valid facebook id', async function () {
         let api_key;
         const req = {
-            user: { id: process.env.TEST_FACEBOOK_ID },
+            user: { id: process.env.TEST_MENTEE_FACEBOOK_ID },
         };
         const res = {
             json(user) {

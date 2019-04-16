@@ -38,13 +38,13 @@ You can set up your own deployment by following these steps:
     For Windows, "C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe"
 
 
-3. Install [MongoDB Compass](https://www.mongodb.com/products/compass), [Robo3T](https://robomongo.org/) or any perferred Mongo DB UI
+3. Install [MongoDB Compass](https://www.mongodb.com/products/compass), [Robo3T](https://robomongo.org/) or any preferred Mongo DB UI
 
-4. In the UI, connect to your MongoDB database, usually `localhost::27017`
+4. In the UI, connect to your MongoDB database, usually `localhost:27017`
 
 5. Create one database called `HeyMentor` (only do this the first time you set up)
 
-    Under the new database, create a new collection: `Users`
+    In the new database, create a new collection: `Users`
 
 6. In order to correctly populate the DB, and to run the API itself, you will need an environment variables file. 
 
@@ -60,13 +60,13 @@ You can set up your own deployment by following these steps:
 
 `npm install`
 
-`npm run start`
+`npm start`
 
 ## Testing
 
 Once you correctly have Mongoose running locally on your machine (following the instructions above),and you have the correct environment variables, you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing and development work.
 
-Before submitting changes, run the test suite locally via `npm run test`
+Before submitting changes, run the test suite locally via `npm test` to identify any test or linting failures
 
 
 # API Surface
@@ -75,7 +75,7 @@ Before submitting changes, run the test suite locally via `npm run test`
 
 __Endpoint__: `/register/<facebook||google>?access_token=<token>`
 
-Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token, which can be used to authenticate against the API.
+Upgrades a federated identity access token (example: a Facebook access token) for a Hey Mentor identity token (api key), which can be used to authenticate against the API.
 
 Response: Identity Token, User ID, or Error
 
@@ -110,6 +110,17 @@ __Endpoint__: `GET /contacts/:userId?token=<token>`
 __Endpoint__: `POST /chat/token/:userId?token=<token>`
 
 - Generates a Twilio chat token for client side chat
+
+Body: 
+```
+{
+    device: <client device>
+}
+```
+
+__Endpoint__: `POST /chat/create/:userId?token=<token>`
+
+- Creates a users Twilio account for chat with other users.
 
 Body: 
 ```

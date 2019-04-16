@@ -35,6 +35,9 @@ router.route('/contacts/:userId')
 router.route('/chat/token/:userId')
     .post(chatController.createToken);
 
+router.route('/chat/create/:userId')
+    .post(chatController.createTwilioUser);
+
 router.all('*', (req, res) => {
     res.status(404).send();
 });
