@@ -12,6 +12,8 @@ The project contains the API surface that supports the following Hey Mentor proj
 
 2. __MongoDB__
 
+3. __Environment Variables__
+
 ## Deploying a Local Database
 
 You can set up your own deployment by following these steps:
@@ -44,9 +46,17 @@ You can set up your own deployment by following these steps:
 
     In the new database, create a new collection: `Users`
 
-9. To test that your deployment is working, run the test suite `npm test`
+6. In order to correctly populate the DB, and to run the API itself, you will need an environment variables file. 
+
+    Under the root project folder, create a new file: `.env`
+
+    If you are part of the Hey Mentor dev team, contact your administrator for the correct `.env` data. 
+
+7. To test that your deployment is working, run the test suite `npm test`
 
 ## Deploying locally
+
+`<Set .env with correct variables>`
 
 `npm install`
 
@@ -54,7 +64,7 @@ You can set up your own deployment by following these steps:
 
 ## Testing
 
-Once you correctly have Mongoose running locally on your machine (following the instructions below) run `npm run db:populate` to populate the db with a bunch of fake data for local testing and development work.
+Once you correctly have Mongoose running locally on your machine (following the instructions above),and you have the correct environment variables, you can run `npm run db:populate` to populate the db with a bunch of fake data for local testing and development work.
 
 Before submitting changes, run the test suite locally via `npm test` to identify any test or linting failures
 
