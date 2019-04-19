@@ -65,18 +65,31 @@ module.exports.populateDB = function () {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
                 contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
             }));
+
+            // Test Mentor
             ops.push(User.create(Object.assign(fake_users[0], {
                 facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
                 contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
                 user_type: 'mentor',
+                person: {
+                    fname: 'Nancy',
+                    lname: 'LeMentor',
+                    kname: 'Ms',
+                },
                 api_key: process.env.TEST_MENTOR_API_KEY,
                 _id: process.env.TEST_MENTOR_USER_ID,
             })));
 
+            // Test Mentee
             ops.push(User.create(Object.assign(fake_users[1], {
                 facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
                 contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTOR_USER_ID]),
                 user_type: 'mentee',
+                person: {
+                    fname: 'Jackson',
+                    lname: "D'Mentee",
+                    kname: 'Mr',
+                },
                 api_key: process.env.TEST_MENTEE_API_KEY,
                 _id: process.env.TEST_MENTEE_USER_ID,
             })));
