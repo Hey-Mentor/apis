@@ -16,7 +16,6 @@ module.exports = function () {
         assert.typeOf(res.body, 'object');
         assert.notExists(res.body.contacts);
         assert.typeOf(res.body._id, 'string');
-        assert.notExists(res.body.facebook_id || res.body.google_id);
         assert.notExists(res.body.api_key);
     });
 

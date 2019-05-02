@@ -55,12 +55,12 @@ exports.facebookRegister = function (req, res) {
             }).orFail(new Error())
                 .then(updated_user => res.status(201).json(updated_user))
                 .catch((err) => {
-                    logger.error('Found user but could not update', err);
+                    logger.error('Found user but could not update', err.toString());
                     res.sendStatus(400);
                 });
         })
         .catch((err) => {
-            logger.error('Could not find user', err);
+            logger.error('Could not find user', err.toString());
             res.sendStatus(400);
         });
 };
@@ -74,7 +74,7 @@ exports.facebookLogin = function (req, res) {
             return res.json(user);
         })
         .catch((err) => {
-            logger.error('Error occurred during find user', err);
+            logger.error('Error occurred during find user', err.toString());
             res.sendStatus(400);
         });
 };

@@ -33,7 +33,10 @@ db.once('open', () => {
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-app.use(morgan('dev'));
+// Don't use morgan in test logs
+if (process.env.NODE_ENV !== 'test') {
+    app.use(morgan('dev'));
+}
 
 app.use(require('./routes/routes'));
 

@@ -1,7 +1,5 @@
 const mongoose = require('mongoose');
 
-const { logger } = require('../logging/logger');
-
 const User = mongoose.model('User');
 
 exports.authorize = function (req, res, next) {
@@ -10,8 +8,7 @@ exports.authorize = function (req, res, next) {
         .then((user) => {
             req.user = user;
             return next();
-        }).catch((err) => {
-            logger.error(err);
+        }).catch(() => {
             res.status(401).send('Unauthorized');
         });
 };
