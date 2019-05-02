@@ -14,7 +14,7 @@ const UserSchema = new Schema({
             return !this.google_id;
         },
         unique: true,
-        select: false,
+        select: true,
     },
     google_id: {
         type: String,
