@@ -8,7 +8,7 @@ exports.getProfile = function (req, res) {
     return Users.findById(req.user._id, { api_key: 0 }).orFail(new Error())
         .then(user => res.json(user))
         .catch((err) => {
-            logger.error(err);
+            logger.error(err.toString());
             res.status(500).json({ Error: 'Something went wrong' });
         });
 };
@@ -19,7 +19,7 @@ exports.updateProfile = function (req, res) {
     }).orFail(new Error())
         .then(updated_user => res.status(200).json(updated_user))
         .catch((err) => {
-            logger.error(err);
+            logger.error(err.toString());
             res.status(500).json({ Error: 'Something went wrong' });
         });
 };
@@ -29,7 +29,7 @@ exports.getContacts = function (req, res) {
         .populate('contacts')
         .then(contacts => res.json(contacts))
         .catch((err) => {
-            logger.error(err);
+            logger.error(err.toString());
             res.status(500).json({ Error: 'Something went wrong' });
         });
 };
