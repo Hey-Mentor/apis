@@ -1,41 +1,46 @@
 const mongoose = require('mongoose');
+const Media = mongoose.model('Media');
 
-mongoose.connect(process.env.TEST_DB_URL, { useNewUrlParser: true });
-
-const db = mongoose.connection;
-
+/**
+*Adds the media file to storage
+*@param Media the media file to add
+*@returns The media file that was created
+*/
 exports.putFile = function (media_file) {
-
-    // return the url to the stored file
-    return 'https://localhost/filereference';
+    Media.create(media_file)
+        .error(err => { throw err.message; })
+        .then(media => { return media; })
 };
 
-// expecting a filter: { _id: id }
-
-exports.deleteFile = function(filter) { 
-
-    // return true if deleted, otherwise false
-    return true;
+/**
+*Deletes the the media files that the provided filter applies to
+*@param Object the filter used to gather what files to delete
+*@returns Whether or not the delete was successful
+*/
+exports.deleteFiles = function(filter) { 
+    Media.deleteMany(filter)
+        .error(err => { return false })
+        .then(() => { return true; });
 };
 
-// expecting a filter: { _id: id }
-// TODO: more metadata here?
-
+/**
+*Gets the first media file that the provided filter applies to
+*@param Object the filter used to gather what files to delete
+*@returns The matching file
+*/
 exports.getFile = function(filter) {
-
-    // return the url to the stored file
-    return 'https://localhost/filereference';
+    Media.findOne(filter)
+        .error(err => { throw err.message; })
+        .then(media => { return media; });
 };
 
-// expecting a filter: { user_info.mentee : id } or { user_info.mentee : id, user_info.mentor: id }
-// TODO: more metadata here?
-
+/**
+*Gets the media files that the provided filter applies to
+*@param Object the filter used to gather what files to delete
+*@returns The matching files
+*/
 exports.getFiles = function(filter) {
-
-    // return a collection of urls
-    var results = [];
-    results.push('https://localhost/filereference');
-    results.push('https://localhost/filereference2');
-
-    return results;
+    Media.findOne(filter)
+        .error(err => { throw err.message; })
+        .then(mediaDocs => { return mediaDocs; });
 }
