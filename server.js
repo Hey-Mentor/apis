@@ -15,6 +15,7 @@ mongoose.Promise = require('bluebird');
 
 mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
+mongoose.set('useUnifiedTopology', true);
 
 const connectionString = process.env.NODE_ENV === 'production'
     ? process.env.DB_URL
