@@ -5,7 +5,7 @@ const { logger } = require('../logging/logger');
 const Users = mongoose.model('User');
 
 exports.getProfile = function (req, res) {
-    return Users.findById(req.user._id, { api_key: 0 }).orFail(new Error())
+    return Users.findById(req.user._id, { api_key: 0, username: 0, password: 0}).orFail(new Error())
         .then(user => res.json(user))
         .catch((err) => {
             logger.error(err.toString());
@@ -14,7 +14,7 @@ exports.getProfile = function (req, res) {
 };
 
 exports.updateProfile = function (req, res) {
-    return Users.findOneAndUpdate(req.user._id, req.body.user, {
+    return Users.findOneAndUpdate({ _id: req.user._id}, req.body.user, {
         new: true,
     }).orFail(new Error())
         .then(updated_user => res.status(200).json(updated_user))
