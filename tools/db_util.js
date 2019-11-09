@@ -6,8 +6,10 @@ const uuid = require('uuid/v4');
 
 const { logger } = require('../logging/logger');
 require('../models/users');
+require('../models/media');
 
 const User = mongoose.model('User');
+const Media = mongoose.model('Media');
 
 const fake_users = new Array(10).fill().map(() => ({
     user_type: faker.random.arrayElement(['mentor', 'mentee']),
@@ -63,8 +65,17 @@ User.schema.eachPath((path) => {
     }
 });
 
-// Empty the DB, then add users and randomly populate their contacts with other users
-module.exports.populateDB = function () {
+// Empty the collection, then add media
+module.exports.populateMedia = function () {
+    return Media.deleteMany({})
+        .then(() => Media.insertMany([
+            { user_info: { mentor: process.env.TEST_MENTOR_USER_ID, mentee: process.env.TEST_MENTEE_USER_ID }, file_info: { name: 'test.docx', type: 'docx', location: 'C:\\Temp\\test.docx' } },
+            { user_info: { mentor: process.env.TEST_MENTOR_USER_ID, mentee: process.env.TEST_MENTEE_USER_ID }, file_info: { name: 'test2.xslx', type: 'xslx', location: 'https:\\localhost\\test.html' } },
+        ]));
+};
+
+// Empty the collection, then add users and randomly populate their contacts with other users
+module.exports.populateUsers = function () {
     return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
         .then(users => users.map(user => user._id))
         .then((user_ids) => {

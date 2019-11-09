@@ -6,6 +6,7 @@ const morgan = require('morgan');
 
 const { logger } = require('./logging/logger');
 require('./models/users');
+require('./models/media');
 
 const app = express();
 const port = process.env.PORT || 8081;
