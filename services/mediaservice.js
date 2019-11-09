@@ -7,7 +7,7 @@ const Media = mongoose.model('Media');
 *@returns The media file that was created
 */
 exports.putFile = function (media_file) {
-    Media.create(media_file)
+    return Media.create(media_file)
         .error(err => { throw err.message; })
         .then(media => { return media; })
 };
@@ -18,7 +18,7 @@ exports.putFile = function (media_file) {
 *@returns Whether or not the delete was successful
 */
 exports.deleteFiles = function(filter) { 
-    Media.deleteMany(filter)
+    return Media.deleteMany(filter)
         .error(err => { return false })
         .then(() => { return true; });
 };
@@ -29,7 +29,7 @@ exports.deleteFiles = function(filter) {
 *@returns The matching file
 */
 exports.getFile = function(filter) {
-    Media.findOne(filter)
+    return Media.findOne(filter)
         .error(err => { throw err.message; })
         .then(media => { return media; });
 };
@@ -40,7 +40,7 @@ exports.getFile = function(filter) {
 *@returns The matching files
 */
 exports.getFiles = function(filter) {
-    Media.findOne(filter)
+    return Media.findOne(filter)
         .error(err => { throw err.message; })
         .then(mediaDocs => { return mediaDocs; });
 }
