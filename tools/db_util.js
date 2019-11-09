@@ -37,11 +37,17 @@ const fake_users = new Array(10).fill().map(() => ({
     support: new Array(3).fill().map(() => faker.random.arrayElement(['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'])),
 }));
 
-// Check fake_users has a value for each schema attribute
+//Username and password wont be set for each. it depends on how the account was created
+const excludedFields = ['username', 'password'];
+
+// Check fake_users has a value for each schema attribute except for the excluded fields
 User.schema.eachPath((path) => {
     // Ignore mongoose attributes
     if (path[0] === '_') { return; }
-
+    if (excludedFields.some(exc => exc === path))
+    {
+        return;
+    }
     const user = fake_users[0];
     if (path.includes('.')) {
         const keys = path.split('.');
