@@ -7,7 +7,6 @@ mongoose.connect(process.env.TEST_DB_URL, { useNewUrlParser: true });
 const db = mongoose.connection;
 
 db.once('open', () => {
-    db_util.populateMedia()
-        .then(() => db_util.populateUsers())
+        db_util.populateDB()
         .then(() => mongoose.connection.close());
 });

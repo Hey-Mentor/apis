@@ -35,6 +35,25 @@ const UserSchema = new Schema({
         }],
         select: false,
     },
+    media: {
+        type: [{
+            upload_date: {
+                type: Date,
+            },
+            file_name: { /* extracted from the media object */
+                type: String,
+                required: true,
+            },
+            file_type: {
+                type: String, /* file extension */
+                required: true,
+            },
+            file_location: { /* uri or file path */
+                type: String,
+                required: true,
+            },
+        }]
+    },
     person: {
         fname: {
             type: String,

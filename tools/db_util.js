@@ -6,10 +6,8 @@ const uuid = require('uuid/v4');
 
 const { logger } = require('../logging/logger');
 require('../models/users');
-require('../models/media');
 
 const User = mongoose.model('User');
-const Media = mongoose.model('Media');
 
 const fake_users = new Array(10).fill().map(() => ({
     user_type: faker.random.arrayElement(['mentor', 'mentee']),
@@ -37,6 +35,7 @@ const fake_users = new Array(10).fill().map(() => ({
     spec_interests: new Array(3).fill().map(() => faker.lorem.words(1)),
     sports: new Array(3).fill().map(() => faker.lorem.words(1)),
     support: new Array(3).fill().map(() => faker.random.arrayElement(['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'])),
+    media: []
 }));
 
 //Username and password wont be set for each. it depends on how the account was created
@@ -75,7 +74,7 @@ module.exports.populateMedia = function () {
 };
 
 // Empty the collection, then add users and randomly populate their contacts with other users
-module.exports.populateUsers = function () {
+module.exports.populateDB = function () {
     return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
@@ -109,6 +108,10 @@ module.exports.populateUsers = function () {
                 },
                 api_key: process.env.TEST_MENTEE_API_KEY,
                 _id: process.env.TEST_MENTEE_USER_ID,
+                media: [
+                    { upload_date: faker.date.random, file_name: 'test1.docx', file_type: 'docx', file_location: 'https:\\\\googledocs.com\\test1.docx'},
+                    { upload_date: faker.date.random, file_name: 'test2.xslx', file_type: 'xslx', file_location: '\\\\\smbshare\\userid\\test2.xslx'},
+                ]
             })));
 
             return Promise.all(ops);
