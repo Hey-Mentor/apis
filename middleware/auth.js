@@ -43,8 +43,5 @@ exports.authorize = function (req, res, next) {
         }).catch(() => {
             res.status(401).send('Unauthorized');
         });
-        if (user.api_key !== req.query.token) {
-            res.status(401).send('Unauthorized');
-        }
     }
 };
