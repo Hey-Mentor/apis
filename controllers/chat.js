@@ -14,6 +14,44 @@ exports.createToken = function (req, res) {
     });
 };
 
+exports.createTwilioChannel = async function (req, res){
+    //Require body to contain channelname
+    if (!req.body.channelName) {
+        return res.status(400).send('Missing channelName');
+    }
+
+    try{
+        const chat_token = TwilioService.TokenGenerator(req.user._id, 'init');
+        const chatClient = await Twilio.Client
+        .create(
+            chat_token, 
+            { logLevel: 'info' }
+        );
+
+        if (!chatClient){
+            return res.sendStatus(501);
+        }
+
+        const channel = await chatClient
+            .createChannel({
+                uniqueName: req.body.channelName,
+                friendlyName: 'Chat channel',
+            }).catch((e) =>{
+                //e.message says why the channel creation failed.
+                return res.status(506).json({ status: 'Failed to create channel. ' + e.message});
+            });
+        
+        console.log('Created new channel.');
+
+    }catch (err) {
+        return res.sendStatus(500);
+    }
+
+    return res.status(201).json({ status: 'Twilio channel created'});
+
+}
+
+
 exports.createTwilioUser = async function (req, res) {
     const chat_token = TwilioService.TokenGenerator(req.user._id, 'init');
 
