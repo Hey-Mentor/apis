@@ -16,6 +16,8 @@ router.get('/login/facebook', passport.authenticate('facebook-token', { session:
 router.post('/register/google', passport.authenticate('google-token', { session: false }),
     credentialsController.googleRegister);
 
+router.post('/user/create', credentialsController.createUser);
+
 /**
  *
  * ALL SECURE ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE

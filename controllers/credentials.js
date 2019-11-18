@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const uuid = require('uuid/v4');
 
+const { handleError } = require('../services/errorHandler');
 const { logger } = require('../logging/logger');
 
 const User = mongoose.model('User');
@@ -43,6 +44,22 @@ passport.use(new GoogleTokenStrategy({
         Provides an HTTP response to the client via "res" parameter
 
 */
+
+exports.createUser = async function (req, res) {
+    const {
+        fname, lname, user_type, facebook_id, google_id,
+    } = req.body;
+    try {
+        const api_key = uuid().replace(/-/g, '');
+        const createdUser = await User.create({
+            person: { fname, lname }, user_type, facebook_id, google_id, api_key,
+        });
+        res.json(createdUser);
+    } catch (err) {
+        logger.error('Could not create user', err.toString());
+        handleError(err, res);
+    }
+};
 
 exports.facebookRegister = function (req, res) {
     return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA).orFail(new Error())
