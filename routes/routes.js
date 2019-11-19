@@ -6,6 +6,7 @@ const chatController = require('../controllers/chat');
 const credentialsController = require('../controllers/credentials');
 const error = require('../middleware/error');
 const profileController = require('../controllers/profile');
+const usersController = require('../controllers/users');
 
 router.post('/register/facebook', passport.authenticate('facebook-token', { session: false }),
     credentialsController.facebookRegister);
@@ -16,7 +17,7 @@ router.get('/login/facebook', passport.authenticate('facebook-token', { session:
 router.post('/register/google', passport.authenticate('google-token', { session: false }),
     credentialsController.googleRegister);
 
-router.post('/user/create', credentialsController.createUser);
+router.post('/user/create', usersController.createUser);
 
 /**
  *

@@ -14,7 +14,7 @@ exports.getProfile = function (req, res) {
 };
 
 exports.updateProfile = function (req, res) {
-    return Users.findByIdAndUpdate(req.user._id, req.body.user, {
+    return Users.findOneAndUpdate({ _id: req.user._id }, req.body.user, {
         new: true,
     }).orFail(new Error())
         .then(updated_user => res.status(200).json(updated_user))

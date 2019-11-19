@@ -31,6 +31,7 @@ module.exports = function () {
         res = await request.put(`/profile/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTOR_API_KEY}`)
             .send({ user: update });
         assert.equal(res.status, 200);
+        assert.equal(process.env.TEST_MENTOR_USER_ID, res.body._id);
         assert.notEqual(gen_interest, res.body.gen_interest);
         assert.equal(res.body.gen_interest, update.gen_interest);
         assert.deepEqual(res.body.support, update.support);
