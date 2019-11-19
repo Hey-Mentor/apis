@@ -49,8 +49,10 @@ exports.createTwilioChannel = async function (req, res) {
                     console.log("Deleted channel: " + channel_sid);
                 });
         }
+
         //code for inviting to channels
         async inviteToChannel(channel_sid, identity) {
+            this.client.chat.services(this.serviceSid)
                 .channels(channel_sid)
                 .invites
                 .create({ identity: identity })
