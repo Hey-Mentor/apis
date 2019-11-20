@@ -86,6 +86,8 @@ exports.createTwilioChannel = async function (req, res) {
                 });
 
                 if(newChannel){
+                    this.inviteToChannel(channelName, '5c15446bbf35ae4057111111');
+                    this.inviteToChannel(channelName, '5c15446bbf35ae4057222222');
                     return res.status(201).json({ status: 'Twilio channel created' });
                 }
         }
