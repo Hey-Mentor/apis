@@ -83,7 +83,7 @@ exports.createTwilioChannel = async function (req, res) {
                     if (error.code === 50307) {
                         //TODO: Try to send invite to both users
                         console.log("Inviting users to existing channel: " + req.body.channelName);
-                        this.sendInvites();
+                        this.checkChannelInviteRequirements();
                     }
 
                     //Returning 5xx error
@@ -95,13 +95,13 @@ exports.createTwilioChannel = async function (req, res) {
             //The channel was created
             if (newChannel) {
                 //send invites
-                this.sendInvites() 
+                this.checkChannelInviteRequirements() 
                 return res.status(201).json({
                     status: 'Twilio channel created'
                 });
             }
         }
-        async sendInvites() {
+        async checkChannelInviteRequirements() {
             if (!req.body.inviteList) {
                 //return res.status(400).send('The body does not contain a channel name');]
                 console.log("No inviteList was in the request body. Not sending any invites. ");
