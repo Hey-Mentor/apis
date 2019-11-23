@@ -22,6 +22,11 @@ router.post('/register/google', passport.authenticate('google-token', { session:
  *
  * */
 router.use('/*/:userId', auth.authorize);
+router.use('/admin/*/:userId', auth.adminAuthorize);
+
+/** ****************PLACE ADMIN ROUTES BELOW******************* */
+router.route('/admin/chat/channel/create/:userId')
+    .post(chatController.createTwilioChannel);
 
 /** ****************PLACE OTHER ROUTES BELOW******************* */
 
