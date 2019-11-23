@@ -67,6 +67,19 @@ exports.createTwilioChannel = async function (req, res) {
                 });
         }
 
+        //code for fetching messages from channel
+        async fetchMessages(channel_sid) {
+            this.client.chat.services(this.serviceSid)
+                .channels(channel_sid)
+                .messages
+                .list({limit:20})
+                .then(function (message) {
+                    message.forEach(m => console.log("Message in channel: " + m.body))
+                    //m.to = channel sid
+                    //m.sid = message resaurce id.
+                });
+        }
+
         //code for creating channels
         async createChannel() {
             const newChannel = await this.client.chat.services(this.serviceSid)
@@ -125,6 +138,9 @@ exports.createTwilioChannel = async function (req, res) {
     //test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057111111');
     //test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057222222');
 
+    //Fetch Messages from a channel
+    test.fetchMessages('CHe157a4c4649646ccb528160bd417d43b');
+    
     try {
         return test.createChannel();
     } catch (err) {
