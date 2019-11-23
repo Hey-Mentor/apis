@@ -72,11 +72,36 @@ exports.createTwilioChannel = async function (req, res) {
             this.client.chat.services(this.serviceSid)
                 .channels(channel_sid)
                 .messages
-                .list({limit:20})
+                .list({
+                    limit: 20
+                })
                 .then(function (message) {
-                    message.forEach(m => console.log("Message in channel: " + m.body))
+                    var incomingMessage= [];
+
+                    message.forEach(m => {
+
+                        incomingMessage.push({
+                            _id: m.to,
+                            text: m.body,
+                            createdAt: m.dateCreated,
+                            user: {
+                                //sender
+                                _id: m.from,
+                                name: m.from,
+                                avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmXGGuS_PrRhQt73sGzdZvnkQrPXvtA-9cjcPxJLhLo8rW-sVA',
+                            },
+                        });
+
+                        console.log("Message in channel: " + m.body)
+                        
+                    });
+
+                    return res.status(200).json(
+                        incomingMessage
+                    );
                     //m.to = channel sid
                     //m.sid = message resaurce id.
+
                 });
         }
 
@@ -108,7 +133,7 @@ exports.createTwilioChannel = async function (req, res) {
             //The channel was created
             if (newChannel) {
                 //send invites
-                this.checkChannelInviteRequirements() 
+                this.checkChannelInviteRequirements()
                 return res.status(201).json({
                     status: 'Twilio channel created'
                 });
@@ -140,12 +165,12 @@ exports.createTwilioChannel = async function (req, res) {
 
     //Fetch Messages from a channel
     test.fetchMessages('CHe157a4c4649646ccb528160bd417d43b');
-    
-    try {
-        return test.createChannel();
-    } catch (err) {
-        return res.sendStatus(500);
-    }
+
+    // try {
+    //     return test.createChannel();
+    // } catch (err) {
+    //     return res.sendStatus(500);
+    // }
 
 
 }
@@ -161,8 +186,6 @@ exports.createTwilioUser = async function (req, res) {
             return res.sendStatus(500);
         }
         this.client.getPublicChannelDescriptors().then((paginator) => {
-            console.log('-        Amount of channels: ' + paginator.items.length);
-
             for (i = 0; i < paginator.items.length; i++) {
                 const channel = paginator.items[i];
                 if (channel.friendlyName === channelName) {
