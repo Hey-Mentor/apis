@@ -16,7 +16,7 @@ exports.adminAuthorize = function(req,res,next){
     User.findOne(
         { 
             _id: req.params.userId, 
-            user_type: 'mentor', 
+            user_type: 'admin', 
             api_key: req.query.token, 
         }, 
         { api_key: 0 })
