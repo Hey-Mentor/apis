@@ -3,11 +3,10 @@ const Twilio = require('twilio-chat');
 const TwilioService = require('../services/twilio');
 
 class Channel {
-    client = require('twilio')(this.accountSid, this.authToken);
-    user = require('mongoose').model('User');
-
     constructor() {
         // Creating public variables
+        this.client = require('twilio')(this.accountSid, this.authToken);
+        this.user = require('mongoose').model('User');
         this.accountSid = process.env.TEST_TWILIO_ACCOUNT_SID;
         this.serviceSid = process.env.TEST_TWILIO_CHAT_SERVICE_SID;
         this.authToken = process.env.TEST_TWILIO_AUTH_TOKEN;
