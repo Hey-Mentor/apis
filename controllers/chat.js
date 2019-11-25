@@ -1,14 +1,14 @@
 const Twilio = require('twilio-chat');
+
 const TwilioService = require('../services/twilio');
 
 class Channel {
-    constructor() {
-        // Creating public
-        this.accountSid = process.env.TEST_TWILIO_ACCOUNT_SID;
-        this.serviceSid = process.env.TEST_TWILIO_CHAT_SERVICE_SID;
-        this.authToken = process.env.TEST_TWILIO_AUTH_TOKEN;
-        this.client = require('twilio')(this.accountSid, this.authToken);
-    }
+    // Creating public variables
+    accountSid = process.env.TEST_TWILIO_ACCOUNT_SID;
+    serviceSid = process.env.TEST_TWILIO_CHAT_SERVICE_SID;
+    authToken = process.env.TEST_TWILIO_AUTH_TOKEN;
+    client = require('twilio')(this.accountSid, this.authToken);
+    user = require('mongoose').model('User');
 
 
     // code for updating channel info
@@ -19,7 +19,7 @@ class Channel {
                 friendlyName: 'Chatroom',
             })
             .then((channel) => {
-                    console.log('Successfully changed the friendly channel name to: ', channel.friendlyName);
+                console.log('Successfully changed the friendly channel name to: ', channel.friendlyName);
             });
     }
 
@@ -29,7 +29,7 @@ class Channel {
         this.client.chat.services(this.serviceSid)
             .channels(channel_sid)
             .remove()
-            .then(function(){
+            .then(() => {
                 console.log('Deleted channel: ' + channel_sid);
             });
     }
@@ -59,30 +59,29 @@ class Channel {
     }
 
 
-    //code for fetching messages from channel
+    // code for fetching messages from channel
     async fetchMessagesTemp(channel_sid) {
-        var ta = await this.client.chat.services(this.serviceSid)
+        const ta = await this.client.chat.services(this.serviceSid)
             .channels(channel_sid)
             .messages
             .list({
-                limit: 20
+                limit: 20,
             })
 
             .then(function (message) {
-                var incomingMessage = [];
-                message.forEach(m => {
+                const incomingMessage = [];
+                message.forEach((m) => {
                     incomingMessage.push({
                         _id: m.to,
                         text: m.body,
                         createdAt: m.dateCreated,
                         user: {
-                            //sender
                             _id: m.from,
                             name: m.from,
                             avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmXGGuS_PrRhQt73sGzdZvnkQrPXvtA-9cjcPxJLhLo8rW-sVA',
                         },
                     });
-                    console.log("Message in channel: " + message);
+                    console.log('Message in channel: ' + message);
                 });
                 return message;
             })
@@ -93,32 +92,33 @@ class Channel {
     }
 
 
-    //code for creating channels
+    // code for creating channels
     async createChannel(req, res) {
-        const newChannel = await this.client.chat.services(this.serviceSid)
+        await this.client.chat.services(this.serviceSid)
             .channels
             .create({
                 uniqueName: req.body.channelName,
                 friendlyName: req.body.channelName,
             })
             .then(() => {
-                //send invites
+                // Send invites
                 this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
                 return res.status(201).json({
-                    status: 'Twilio channel created'
+                    status: 'Twilio channel created',
                 });
             })
             .catch(async (error) => {
-                console.log('Failed to create channel. ' + error.message + ". Error: " + error.code);
-                //Catch channel already exists
+                console.log('Failed to create channel. ' + error.message + '. Error: ' + error.code);
+                // Catch channel already exists
                 if (error.code === 50307) {
-                    //TODO: Try to send invite to both users
-                    console.log("Inviting users to existing channel: " + req.body.channelName + "  :" + req.body.inviteList);
+                    // TODO: Try to send invite to both users
+                    console.log('Inviting users to existing channel: ' 
+                    + req.body.channelName + '  :' + req.body.inviteList);
                     await this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
                 }
-                //Returning 5xx error
+                // Returning 5xx error
                 return res.status(501).json({
-                    status: 'Failed to create channel. ' + error.message + ". Error: " + error.code
+                    status: 'Failed to create channel. ' + error.message + ". Error: " + error.code,
                 });
             });
     }
@@ -126,23 +126,19 @@ class Channel {
 
     async checkChannelInviteRequirements(channelName, inviteList) {
         if (!inviteList) {
-            //return res.status(400).send('The body does not contain a channel name');]
-            console.log("No invitations were sent. ");
+            // return res.status(400).send('The body does not contain a channel name');]
+            console.log('No invitations were sent. ');
         }
-        //If there are any users in the body of the post request
+        // If there are any users in the body of the post request
         if (inviteList) {
-            var i;
-            const mongoose = require('mongoose');
-            const User = mongoose.model('User');
             inviteList.forEach(element => {
-                //Check if user exist
-                User.findOne({
+                // Check if user exist
+                this.user.findOne({
                         _id: element,
                     })
                     .orFail(new Error())
                     .then(async function () {
-                        test = new Channel();
-                        await test.inviteToChannel(channelName, element);
+                        new Channel().inviteToChannel(channelName, element);
                     }).catch((er) => {
                         console.log('The user ' + element + ' was not found in the database. Error: ' + er.message);
                         return false;
@@ -170,7 +166,6 @@ exports.fetchMessages = async function (req, res) {
     test = new Channel();
     const messages = await test.fetchMessagesTemp('CHe157a4c4649646ccb528160bd417d43b');
 
-
     if (messages) {
         return res.status(400).send(messages);
     }
@@ -178,27 +173,28 @@ exports.fetchMessages = async function (req, res) {
 
 
 exports.createTwilioChannel = async function (req, res) {
-    //Require body to contain channelname
+    // Require body to contain channelname
     if (!req.body.channelName) {
         return res.status(400).send('The body does not contain a channel name');
     }
 
     test = new Channel();
-    //test.deleteChannel('CHff026731988947f8a8b2646831ef376d');
-    //test.updateChannelData('CHc71753c96f8545d6a99d0e054cc48485');
-    //test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057111111');
-    //test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057222222');
-    //test.fetchMessagesTemp('CHe157a4c4649646ccb528160bd417d43b');
-    //return res.sendStatus(200);
+    // test.deleteChannel('CHff026731988947f8a8b2646831ef376d');
+    // test.updateChannelData('CHc71753c96f8545d6a99d0e054cc48485');
+    // test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057111111');
+    // test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057222222');
+    // test.fetchMessagesTemp('CHe157a4c4649646ccb528160bd417d43b');
+    // return res.sendStatus(200);
 
     try {
-        channel = await test.createChannel(req, res);
+        const channel = await test.createChannel(req, res);
         if (channel) {
-            return; //res.sendStatus(200);
+            return; // res.sendStatus(200);
         }
     } catch (err) {
-        return; //res.sendStatus(500);
+        return; // res.sendStatus(500);
     }
+    return;
 }
 
 
