@@ -12,7 +12,7 @@ class Channel {
 
 
     // code for updating channel info
-    async updateChannelData(channel_sid) {
+    async updateChannelData (channel_sid) {
         this.client.chat.services(this.serviceSid)
             .channels(channel_sid)
             .update({
