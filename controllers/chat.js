@@ -68,6 +68,24 @@ class Channel {
             });
     }
 
+    //  code for adding to channels
+    async addToChannel(channel_sid, user) {
+        const addUser = await this.client.chat.services(this.serviceSid)
+            .channels(channel_sid)
+            .members
+            .create({ identity: user })
+            .then((member) => {
+                console.log(`Invited user: ${member.sid} to channel: ${channel_sid}`);
+                return true;
+            })
+            .catch((er) =>{
+                console.log(`Failed to add "${user}" to channel "${channel_sid}" ${er} - ${er.code}`);
+                return false;
+            });
+
+        return addUser;
+    }
+
 
     // code for fetching messages from channel
     async fetchMessagesTemp(channel_sid) {
