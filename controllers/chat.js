@@ -78,7 +78,7 @@ class Channel {
                 console.log(`Invited user: ${member.sid} to channel: ${channel_sid}`);
                 return true;
             })
-            .catch((er) =>{
+            .catch((er) => {
                 console.log(`Failed to add "${user}" to channel "${channel_sid}" ${er} - ${er.code}`);
                 return false;
             });
