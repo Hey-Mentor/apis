@@ -75,7 +75,7 @@ class Channel {
             .members
             .create({ identity: user })
             .then((member) => {
-                console.log(`Invited user: ${member.sid} to channel: ${channel_sid}`);
+                console.log(`Added user: ${member.sid} to channel: ${channel_sid}`);
                 return true;
             })
             .catch((er) => {
@@ -163,7 +163,7 @@ class Channel {
                 })
                     .orFail(new Error())
                     .then(async () => {
-                        new Channel().inviteToChannel(channelName, element);
+                        new Channel().addToChannel(channelName, element);
                     }).catch((er) => {
                         console.log(`The user ${element} was not found in the database. Error: ${er.message}`);
                         return false;
