@@ -198,29 +198,36 @@ exports.fetchMessages = async function (req, res) {
 };
 
 
+exports.deleteTwilioChannel = async function (req, res) {
+    if (!req.body.channelSid) {
+        return res.status(400).send('The body does not contain a channel name');
+    }
+    const deleteChannel = new Channel().deleteChannel(req.body.channelSid);
+
+    if (deleteChannel) {
+        return res.status(200).send(`Deleted channel: ${req.body.channelSid} from Twilio`);
+    }
+    return res.status(500).send(`Failed to delete channel: ${req.body.channelSid} from Twilio`);
+};
+
+
 exports.createTwilioChannel = async function (req, res) {
     // Require body to contain channelname
     if (!req.body.channelName) {
         return res.status(400).send('The body does not contain a channel name');
     }
 
-    const test = new Channel();
-    // test.deleteChannel('CHff026731988947f8a8b2646831ef376d');
-    // test.updateChannelData('CHc71753c96f8545d6a99d0e054cc48485');
-    // test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057111111');
-    // test.inviteToChannel('CH8a8d7a942f594416a080ccbb7a809e74', '5c15446bbf35ae4057222222');
-    // test.fetchMessagesTemp('CHe157a4c4649646ccb528160bd417d43b');
-    // return res.sendStatus(200);
 
-    try {
-        const channel = await test.createChannel(req, res);
-        if (channel) {
-            return res.status(200).send('Created Channel');
-        }
-    } catch (err) {
-        res.sendStatus(500);
+    const channel = await new Channel().createChannel(req, res);
+    if (channel) {
+        return res.status(200).json(
+            {
+                channel,
+            },
+        );
     }
-    return res.status(200).send('Created Channel');
+
+    return res.status(500).send('Channel was not created');
 };
 
 

@@ -28,6 +28,9 @@ router.use('/admin/*/:userId', auth.adminAuthorize);
 router.route('/admin/chat/channel/create/:userId')
     .post(chatController.createTwilioChannel);
 
+router.route('/admin/chat/channel/delete/:userId')
+    .delete(chatController.deleteTwilioChannel);
+
 /** ****************PLACE OTHER ROUTES BELOW******************* */
 
 router.route('/profile/:userId')
@@ -42,9 +45,6 @@ router.route('/chat/token/:userId')
 
 router.route('/chat/create/:userId')
     .post(chatController.createTwilioUser);
-
-router.route('/chat/channel/create/:userId')
-    .post(chatController.createTwilioChannel);
 
 router.route('/chat/channel/messages/:userId')
     .post(chatController.fetchMessages);
