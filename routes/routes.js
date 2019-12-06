@@ -46,9 +46,6 @@ router.route('/chat/token/:userId')
 router.route('/chat/create/:userId')
     .post(chatController.createTwilioUser);
 
-router.route('/chat/channel/messages/:userId')
-    .post(chatController.fetchMessages);
-
 router.all('*', (req, res) => {
     res.status(404).send();
 });
