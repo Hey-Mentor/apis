@@ -95,37 +95,6 @@ class Channel {
     }
 
 
-    // code for fetching messages from channel
-    async fetchMessagesTemp(channel_sid) {
-        const ta = await this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .messages
-            .list({
-                limit: 20,
-            })
-
-            .then((message) => {
-                const incomingMessage = [];
-                message.forEach((m) => {
-                    incomingMessage.push({
-                        _id: m.to,
-                        text: m.body,
-                        createdAt: m.dateCreated,
-                        user: {
-                            _id: m.from,
-                            name: m.from,
-                            avatar: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQmXGGuS_PrRhQt73sGzdZvnkQrPXvtA-9cjcPxJLhLo8rW-sVA',
-                        },
-                    });
-                    console.log(`Message in channel: ${message}`);
-                });
-                return message;
-            })
-            .then(message => message);
-        return ta;
-    }
-
-
     // code for creating channels
     async createChannel(req, res) {
         await this.client.chat.services(this.serviceSid)
@@ -193,17 +162,6 @@ exports.createToken = function (req, res) {
         _id: req.user._id,
         chat_token,
     });
-};
-
-
-exports.fetchMessages = async function (req, res) {
-    const test = new Channel();
-    const messages = await test.fetchMessagesTemp('CHe157a4c4649646ccb528160bd417d43b');
-
-    if (messages) {
-        return res.status(200).send(messages);
-    }
-    return res.status(400).send(messages);
 };
 
 
