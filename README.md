@@ -128,3 +128,31 @@ Body:
     device: <client device>
 }
 ```
+
+## Admin App API Surface
+
+#### All of the following calls require a registered API access token 
+#### The auth.adminAuthorize function checks if the user is an 'admin'
+
+__Endpoint__: `POST /admin/chat/channel/create/:userId?token=<token>`
+
+- Creates a twilio channel, and invites users.
+
+Body: 
+```
+{
+	"channelName": "Channel name",
+	"inviteList": ["User Identity", ... , "5c15446bbf35ae4057111111"]
+}
+```
+
+__Endpoint__: `DELETE /admin/chat/channel/delete/:userId?token=<token>`
+
+- Deletes a twilio channel
+
+Body: 
+```
+{
+	"channelSid":"CHXXXXXXXXXXXXXXXXXXXXXXXXX"
+}
+```
