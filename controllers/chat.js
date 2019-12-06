@@ -20,6 +20,14 @@ class Channel {
     }
 
 
+    async fetchChannel(channel_sid) {
+        return this.client.chat.services(this.serviceSid)
+            .channels(channel_sid)
+            .fetch()
+            .then(channel => channel);
+    }
+
+
     // code for updating channel info
     async updateChannelData(channel_sid) {
         this.client.chat.services(this.serviceSid)
@@ -126,9 +134,9 @@ class Channel {
                 uniqueName: req.body.channelName,
                 friendlyName: req.body.channelName,
             })
-            .then((çreatedChannel) => {
+            .then(async (çreatedChannel) => {
                 // Send invites
-                this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
+                await this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
                 return res.status(201).json({
                     channel: çreatedChannel,
                     status: 'Twilio channel created',
