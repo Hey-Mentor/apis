@@ -126,10 +126,11 @@ class Channel {
                 uniqueName: req.body.channelName,
                 friendlyName: req.body.channelName,
             })
-            .then(() => {
+            .then((çreatedChannel) => {
                 // Send invites
                 this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
                 return res.status(201).json({
+                    channel: çreatedChannel,
                     status: 'Twilio channel created',
                 });
             })
