@@ -25,6 +25,12 @@ router.use('/*/:userId', auth.authorize);
 
 /** ****************PLACE OTHER ROUTES BELOW******************* */
 
+router.route('/chat/channel/media/links/:userId')
+    .post(chatController.getLinks);
+
+router.route('/media/link/:userId')
+    .post(chatController.getLinkInfo);
+
 router.route('/profile/:userId')
     .get(profileController.getProfile)
     .put(profileController.updateProfile);
