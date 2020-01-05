@@ -27,6 +27,12 @@ exports.createChatChannel = async function (req, res) {
 
     // TODO: Check if each user already has a channel created, and skip if needed
 
+    // TODO: Create the actual channel in Twilio
+    // (Fredrik's code has this, but I took it out to move
+    //   away from the class-based approach)
+
+    // TODO: Add the appropriate members to the channel
+
     return res.sendStatus(500);
 };
 
