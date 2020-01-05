@@ -109,50 +109,40 @@ __Endpoint__: `GET /contacts/:userId?token=<token>`
 
 __Endpoint__: `POST /chat/token/:userId?token=<token>`
 
-- Generates a Twilio chat token for client side chat
+- Generates a chat token for client side messaging
 
 Body: 
 ```
 {
-    device: <client device>
+    device: <client device ID>
 }
 ```
 
-__Endpoint__: `POST /chat/create/:userId?token=<token>`
+## Admin APIs
 
-- Creates a users Twilio account for chat with other users.
+#### All of the following calls require a registered API access token, and the 
+#### calling user must be an admin
+
+__Endpoint__: `POST /admin/chat/create/?token=<token>`
+
+- Creates a user account with chat capability, from an existing Hey Mentor user
 
 Body: 
 ```
 {
-    device: <client device>
+    user_id: <ID of an existing Hey Mentor user>
 }
 ```
 
-## Admin App API Surface
-
-#### All of the following calls require a registered API access token 
-#### The auth.adminAuthorize function checks if the user is an 'admin'
 
 __Endpoint__: `POST /admin/chat/channel/create/:userId?token=<token>`
 
-- Creates a twilio channel, and invites users.
+- Creates a fully-initialized chat channel for communication between a set of users
 
 Body: 
 ```
 {
 	"channelName": "Channel name",
 	"inviteList": ["User Identity", ... , "5c15446bbf35ae4057111111"]
-}
-```
-
-__Endpoint__: `DELETE /admin/chat/channel/delete/:userId?token=<token>`
-
-- Deletes a twilio channel
-
-Body: 
-```
-{
-	"channelSid":"CHXXXXXXXXXXXXXXXXXXXXXXXXX"
 }
 ```

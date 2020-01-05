@@ -1,156 +1,8 @@
-/* eslint-disable no-undef */
-/* eslint-disable no-plusplus */
-/* eslint-disable max-len */
-/* eslint-disable no-console */
+
 const Twilio = require('twilio-chat');
 
 const TwilioService = require('../services/twilio');
-
-class Channel {
-    constructor() {
-        // Creating public variables
-        this.accountSid = process.env.TEST_TWILIO_ACCOUNT_SID;
-        this.serviceSid = process.env.TEST_TWILIO_CHAT_SERVICE_SID;
-        this.authToken = process.env.TEST_TWILIO_AUTH_TOKEN;
-
-        // eslint-disable-next-line global-require
-        this.client = require('twilio')(this.accountSid, this.authToken);
-        // eslint-disable-next-line global-require
-        this.user = require('mongoose').model('User');
-    }
-
-
-    async fetchChannel(channel_sid) {
-        return this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .fetch()
-            .then(channel => channel);
-    }
-
-
-    // code for updating channel info
-    async updateChannelData(channel_sid) {
-        this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .update({
-                friendlyName: 'Chatroom',
-            })
-            .then(() => {
-                // console.log('Successfully changed the friendly channel name to: '
-                // , channel.friendlyName);
-            });
-    }
-
-
-    // code for deleting channels
-    async deleteChannel(channel_sid) {
-        this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .remove()
-            .then(() => {
-                // console.log('Deleted channel: ' + channel_sid);
-            });
-    }
-
-
-    //  code for inviting to channels
-    async inviteToChannel(channel_sid, user) {
-        this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .invites
-            .create({
-                identity: user,
-            })
-            .then((invite) => {
-                console.log(`Invited user: ${invite.sid} to channel: ${channel_sid}`);
-                return true;
-            })
-            .catch((er) => {
-                // User already invited - Error code: 50212
-                if (er.code === 50212) {
-                    console.log(`Failed to invite "${user}" to channel "${channel_sid}" ${er} - ${er.code}`);
-                    return true;
-                }
-                console.log(`Failed to invite "${user}" to channel "${channel_sid}" ${er} - ${er.code}`);
-                return false;
-            });
-    }
-
-    //  code for adding to channels
-    async addToChannel(channel_sid, user) {
-        const addUser = await this.client.chat.services(this.serviceSid)
-            .channels(channel_sid)
-            .members
-            .create({ identity: user })
-            .then((member) => {
-                console.log(`Added user: ${member.sid} to channel: ${channel_sid}`);
-                return true;
-            })
-            .catch((er) => {
-                console.log(`Failed to add "${user}" to channel "${channel_sid}" ${er} - ${er.code}`);
-                return false;
-            });
-
-        return addUser;
-    }
-
-
-    // code for creating channels
-    async createChannel(req, res) {
-        await this.client.chat.services(this.serviceSid)
-            .channels
-            .create({
-                uniqueName: req.body.channelName,
-                friendlyName: req.body.channelName,
-            })
-            .then(async (çreatedChannel) => {
-                // Send invites
-                await this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
-                return res.status(201).json({
-                    channel: çreatedChannel,
-                    status: 'Twilio channel created',
-                });
-            })
-            .catch(async (error) => {
-                console.log(`Failed to create channel. ${error.message}. Error: ${error.code}`);
-                // Catch channel already exists
-                if (error.code === 50307) {
-                    // TODO: Try to send invite to both users
-                    console.log(`Inviting users to existing channel: ${req.body.channelName}  :${req.body.inviteList}`);
-                    await this.checkChannelInviteRequirements(req.body.channelName, req.body.inviteList);
-                }
-                // Returning 5xx error
-                return res.status(501).json({
-                    status: `Failed to create channel. ${error.message}. Error: ${error.code}`,
-                });
-            });
-    }
-
-
-    async checkChannelInviteRequirements(channelName, inviteList) {
-        if (!inviteList) {
-            // return res.status(400).send('The body does not contain a channel name');]
-            console.log('No invitations were sent. ');
-        }
-        // If there are any users in the body of the post request
-        if (inviteList) {
-            inviteList.forEach((element) => {
-                // Check if user exist
-                this.user.findOne({
-                    _id: element,
-                })
-                    .orFail(new Error())
-                    .then(async () => {
-                        new Channel().addToChannel(channelName, element);
-                    }).catch((er) => {
-                        console.log(`The user ${element} was not found in the database. Error: ${er.message}`);
-                        return false;
-                    });
-            });
-        }
-    }
-}
-
+const UserValidation = require('../services/userValidation');
 
 exports.createToken = function (req, res) {
     if (!req.body.device) {
@@ -164,64 +16,34 @@ exports.createToken = function (req, res) {
     });
 };
 
+exports.createChatChannel = async function (req, res) {
+    const allValid = req.body.user_ids.array.forEach(
+        element => UserValidation.ValidateChatUser(element, true),
+    );
 
-exports.deleteTwilioChannel = async function (req, res) {
-    if (!req.body.channelSid) {
-        return res.status(400).send('The body does not contain a channel name');
+    if (!allValid) {
+        return res.sendStatus(400);
     }
-    const deleteChannel = new Channel().deleteChannel(req.body.channelSid);
 
-    if (deleteChannel) {
-        return res.status(200).send(`Deleted channel: ${req.body.channelSid} from Twilio`);
-    }
-    return res.status(500).send(`Failed to delete channel: ${req.body.channelSid} from Twilio`);
+    // TODO: Check if each user already has a channel created, and skip if needed
+
+    return res.sendStatus(500);
 };
 
-
-exports.createTwilioChannel = async function (req, res) {
-    // Require body to contain channelname
-    if (!req.body.channelName) {
-        return res.status(400).send('The body does not contain a channel name');
+exports.createChatUser = async function (req, res) {
+    if (!UserValidation.ValidateChatUser(req.body.user_id, false)) {
+        return res.sendStatus(400);
     }
-
-
-    const channel = await new Channel().createChannel(req, res);
-    if (channel) {
-        return res.status(200).json(
-            {
-                channel,
-            },
-        );
-    }
-
-    return res.status(500).send('Channel was not created');
-};
-
-
-exports.createTwilioUser = async function (req, res) {
-    const chat_token = TwilioService.TokenGenerator(req.user._id, 'init');
 
     try {
-        // Init twilio client
-        const client = await Twilio.Client.create(chat_token);
+        const client = await Twilio.Client.create(TwilioService.TokenGenerator(req.user._id, 'init'));
         if (!client) {
             return res.sendStatus(500);
         }
-        this.client.getPublicChannelDescriptors().then((paginator) => {
-            // eslint-disable-next-line no-undef
-            for (i = 0; i < paginator.items.length; i++) {
-                const channel = paginator.items[i];
-                if (channel.friendlyName === channelName) {
-                    console.log('-Channel already exist');
-                    return channel.getChannel();
-                }
-            }
-            return false;
-        });
+
+        UserValidation.InitChatUser(req.body.user_id);
     } catch (err) {
         return res.sendStatus(500);
     }
-    return res.status(201).json({
-        status: 'Twilio user created',
-    });
+    return res.sendStatus(201);
 };
