@@ -1,6 +1,17 @@
+const accountSid = process.env.NODE_ENV === 'production'
+    ? process.env.TWILIO_CHAT_SERVICE_SID
+    : process.env.TEST_TWILIO_CHAT_SERVICE_SID;
+const authToken = process.env.NODE_ENV === 'production'
+    ? process.env.TWILIO_CHAT_SERVICE_SID
+    : process.env.TEST_TWILIO_CHAT_SERVICE_SID;
+const servicesId = process.env.NODE_ENV === 'production'
+    ? process.env.TWILIO_CHAT_SERVICE_SID
+    : process.env.TEST_TWILIO_CHAT_SERVICE_SID;
 
+const client = require('twilio')(accountSid, authToken);
 const Twilio = require('twilio-chat');
 
+const Helpers = require('../services/helpers');
 const TwilioService = require('../services/twilio');
 const UserValidation = require('../services/userValidation');
 
@@ -8,7 +19,10 @@ exports.createToken = function (req, res) {
     if (!req.body.device) {
         return res.status(400).send('Missing device');
     }
-    const chat_token = TwilioService.TokenGenerator(req.user._id, req.body.device);
+    const chat_token = TwilioService.TokenGenerator(
+        req.user._id,
+        req.body.device,
+    );
 
     return res.json({
         _id: req.user._id,
@@ -17,9 +31,7 @@ exports.createToken = function (req, res) {
 };
 
 exports.createChatChannel = async function (req, res) {
-    const allValid = req.body.user_ids.array.forEach(
-        element => UserValidation.ValidateChatUser(element, true),
-    );
+    const allValid = req.body.user_ids.array.forEach(element => UserValidation.ValidateChatUser(element, true));
 
     if (!allValid) {
         return res.sendStatus(400);
@@ -33,6 +45,32 @@ exports.createChatChannel = async function (req, res) {
 
     // TODO: Add the appropriate members to the channel
 
+    const channelUniqueName = Helpers.getUniqueStringName(32);
+    const channelFriendlyName = Helpers.getUniqueStringName(16);
+
+    const newChannel = await client.chat
+        .services(servicesId)
+        .channels.create({
+            uniqueName: channelUniqueName,
+            friendlyName: channelFriendlyName,
+        })
+        .catch((error) => {
+            // Catch channel already exists
+            if (error.code === 50307) {
+                // TODO: Try to send invite to all users if needed
+            }
+
+            // Returning 5xx error
+            return res.status(501).json({
+                status: `Failed to create channel. ${error.message}. Error: ${error.code}`,
+            });
+        });
+
+    if (newChannel) {
+    // TODO: Add or invite all users
+        return res.status(201).json({ status: 'Twilio channel created' });
+    }
+
     return res.sendStatus(500);
 };
 
@@ -42,8 +80,10 @@ exports.createChatUser = async function (req, res) {
     }
 
     try {
-        const client = await Twilio.Client.create(TwilioService.TokenGenerator(req.user._id, 'init'));
-        if (!client) {
+        const twilioClient = await Twilio.Client.create(
+            TwilioService.TokenGenerator(req.user._id, 'init'),
+        );
+        if (!twilioClient) {
             return res.sendStatus(500);
         }
 
