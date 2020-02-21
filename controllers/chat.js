@@ -1,6 +1,6 @@
 const accountSid = process.env.NODE_ENV === 'production'
-    ? process.env.TWILIO_CHAT_SERVICE_SID
-    : process.env.TEST_TWILIO_CHAT_SERVICE_SID;
+    ? process.env.TWILIO_ACCOUNT_SID
+    : process.env.TEST_TWILIO_ACCOUNT_SID;
 const authToken = process.env.NODE_ENV === 'production'
     ? process.env.TWILIO_AUTH_TOKEN
     : process.env.TEST_TWILIO_AUTH_TOKEN;
