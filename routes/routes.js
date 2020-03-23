@@ -22,8 +22,16 @@ router.post('/register/google', passport.authenticate('google-token', { session:
  *
  * */
 router.use('/*/:userId', auth.authorize);
+router.use('/admin/*/', auth.adminAuthorize);
 
-/** ****************PLACE OTHER ROUTES BELOW******************* */
+/** ****************PLACE ADMIN ROUTES BELOW******************* */
+router.route('/admin/chat/channel/create/')
+    .post(chatController.createChatChannel);
+
+router.route('/admin/chat/create/')
+    .post(chatController.createChatUser);
+
+/** ****************PLACE NON-ADMIN, SECURE ROUTES BELOW******************* */
 
 router.route('/profile/:userId')
     .get(profileController.getProfile)
@@ -34,9 +42,6 @@ router.route('/contacts/:userId')
 
 router.route('/chat/token/:userId')
     .post(chatController.createToken);
-
-router.route('/chat/create/:userId')
-    .post(chatController.createTwilioUser);
 
 router.all('*', (req, res) => {
     res.status(404).send();

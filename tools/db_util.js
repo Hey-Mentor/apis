@@ -14,6 +14,7 @@ const fake_users = new Array(10).fill().map(() => ({
     facebook_id: faker.random.number(),
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
+    channel_id: 'test',
     contacts: [],
     person: {
         fname: faker.name.firstName(),
@@ -34,13 +35,24 @@ const fake_users = new Array(10).fill().map(() => ({
     gen_interest: faker.lorem.sentences(),
     spec_interests: new Array(3).fill().map(() => faker.lorem.words(1)),
     sports: new Array(3).fill().map(() => faker.lorem.words(1)),
-    support: new Array(3).fill().map(() => faker.random.arrayElement(['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'])),
+    support: new Array(3)
+        .fill()
+        .map(() => faker.random.arrayElement([
+            'college_applications',
+            'scholarships',
+            'financial_aid',
+            'college_search',
+            'career_advice',
+            'exam_preparation',
+        ])),
 }));
 
 // Check fake_users has a value for each schema attribute
 User.schema.eachPath((path) => {
     // Ignore mongoose attributes
-    if (path[0] === '_') { return; }
+    if (path[0] === '_') {
+        return;
+    }
 
     const user = fake_users[0];
     if (path.includes('.')) {
@@ -53,7 +65,7 @@ User.schema.eachPath((path) => {
             prop = prop[key];
         });
     } else if (!user[path]) {
-        throw new Error(`Mock data lacking schema property: ${path}`);
+        throw new Error(`Mock data lacking schema property hello : ${path}`);
     }
 });
 
@@ -63,36 +75,52 @@ module.exports.populateDB = function () {
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
-                contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
+                contacts: user_ids.filter(
+                    id => id !== user_id && Math.random() >= 0.5,
+                ),
             }));
 
             // Test Mentor
-            ops.push(User.create(Object.assign(fake_users[0], {
-                facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
-                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
-                user_type: 'mentor',
-                person: {
-                    fname: 'Nancy',
-                    lname: 'LeMentor',
-                    kname: 'Ms',
-                },
-                api_key: process.env.TEST_MENTOR_API_KEY,
-                _id: process.env.TEST_MENTOR_USER_ID,
-            })));
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[0], {
+                        facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
+                        contacts: user_ids
+                            .map(user => user._id)
+                            .concat([process.env.TEST_MENTEE_USER_ID]),
+                        user_type: 'mentor',
+                        person: {
+                            fname: 'Nancy',
+                            lname: 'LeMentor',
+                            kname: 'Ms',
+                        },
+                        channel_id: process.env.TEST_CHANNEL_ID,
+                        api_key: process.env.TEST_MENTOR_API_KEY,
+                        _id: process.env.TEST_MENTOR_USER_ID,
+                    }),
+                ),
+            );
 
             // Test Mentee
-            ops.push(User.create(Object.assign(fake_users[1], {
-                facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
-                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTOR_USER_ID]),
-                user_type: 'mentee',
-                person: {
-                    fname: 'Jackson',
-                    lname: "D'Mentee",
-                    kname: 'Mr',
-                },
-                api_key: process.env.TEST_MENTEE_API_KEY,
-                _id: process.env.TEST_MENTEE_USER_ID,
-            })));
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[1], {
+                        facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
+                        contacts: user_ids
+                            .map(user => user._id)
+                            .concat([process.env.TEST_MENTOR_USER_ID]),
+                        user_type: 'mentee',
+                        person: {
+                            fname: 'Jackson',
+                            lname: "D'Mentee",
+                            kname: 'Mr',
+                        },
+                        channel_id: process.env.TEST_CHANNEL_ID,
+                        api_key: process.env.TEST_MENTEE_API_KEY,
+                        _id: process.env.TEST_MENTEE_USER_ID,
+                    }),
+                ),
+            );
 
             return Promise.all(ops);
         })
