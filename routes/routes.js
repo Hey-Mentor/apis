@@ -21,7 +21,6 @@ router.post('/register/google', passport.authenticate('google-token', { session:
  * ALL SECURE ENDPOINTS MUST GO AFTER THE AUTHORIZE MIDDLEWARE
  *
  * */
-router.use('/*/:userId', auth.authorize);
 router.use('/admin/*/', auth.adminAuthorize);
 
 /** ****************PLACE ADMIN ROUTES BELOW******************* */
@@ -32,6 +31,8 @@ router.route('/admin/chat/create/')
     .post(chatController.createChatUser);
 
 /** ****************PLACE NON-ADMIN, SECURE ROUTES BELOW******************* */
+
+router.use('/*/:userId', auth.authorize);
 
 router.route('/profile/:userId')
     .get(profileController.getProfile)

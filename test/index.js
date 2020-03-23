@@ -3,9 +3,8 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 
 const authTests = require('./auth_test');
-const chatTests = require('./chat_test');
-
 const channelTests = require('./create_chat_channel_test');
+const chatTests = require('./chat_test');
 const contactTests = require('./contact_test');
 const credentialControllerTests = require('./credentials_test');
 const db_util = require('../tools/db_util');

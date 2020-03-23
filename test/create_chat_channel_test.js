@@ -11,16 +11,21 @@ const request = chai.request(app).keepOpen();
 /* eslint-disable prefer-arrow-callback */
 
 module.exports = function () {
-    it('/create chat channel 1', async function () {
-        const res = await request.post(`/admin/chat/channel/create?token=${process.env.TEST_MENTEE_API_KEY}`)
+    it('channel creation should succeed for admin credential', async function () {
+        const res = await request.post(`/admin/chat/channel/create?token=${process.env.TEST_ADMIN_USER_API_KEY}`)
             .send({
                 device: 'test',
+                user_ids: [`${process.env.TEST_MENTEE_USER_ID}`],
             });
         assert.equal(res.status, 200);
     });
 
-    it('/create chat channel 2', async function () {
-        const res = await request.post(`/admin/chat/channel/create?token=${process.env.TEST_MENTEE_API_KEY}`);
-        assert.equal(res.status, 400);
+    it('channel creation should fail for regular credential', async function () {
+        const res = await request.post(`/admin/chat/channel/create?token=${process.env.TEST_MENTEE_API_KEY}`)
+            .send({
+                device: 'test',
+                user_ids: ['a', 'b', 'c'],
+            });
+        assert.equal(res.status, 401);
     });
 };

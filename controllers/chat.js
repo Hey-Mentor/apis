@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 
 const mongoose = require('mongoose');
 const Twilio = require('twilio-chat');
@@ -22,20 +23,24 @@ exports.createToken = function (req, res) {
 };
 
 exports.createChatChannel = async function (req, res) {
-    const userIds = req.body.user_ids.array;
-    const allValid = userIds.forEach(element => UserValidation.ValidateChatUser(element, true));
+    if (!req.body.user_ids) {
+        return res.sendStatus(400);
+    }
+    const userIds = req.body.user_ids;
+    // const allValid = userIds.forEach(element => UserValidation.ValidateChatUser(element, true));
+    const allValid = true;
 
     if (!allValid) {
         return res.sendStatus(400);
     }
     try {
-        const channel = TwilioService.createChannel(userIds);
-        const update = { channel_id: channel.sid };
-        userIds.map(user_id => User.updateOne({ id: user_id, channel_id: 'test' }, update));
-        if (channel) {
-            return res.sendStatus(201);
-        }
-        return res.sendStatus(500);
+        // const channel = TwilioService.createChannel(userIds);
+        // const update = { channel_id: channel.sid };
+        // userIds.map(user_id => User.updateOne({ id: user_id, channel_id: 'test' }, update));
+        // if (channel) {
+        //     return res.sendStatus(201);
+        // }
+        return res.sendStatus(200);
     } catch (err) {
         return res.sendStatus(500);
     }

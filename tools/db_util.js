@@ -71,7 +71,7 @@ User.schema.eachPath((path) => {
 
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
-    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
+    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(3))
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
@@ -118,6 +118,22 @@ module.exports.populateDB = function () {
                         channel_id: process.env.TEST_CHANNEL_ID,
                         api_key: process.env.TEST_MENTEE_API_KEY,
                         _id: process.env.TEST_MENTEE_USER_ID,
+                    }),
+                ),
+            );
+
+            // Test Admin
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[2], {
+                        user_type: 'admin',
+                        person: {
+                            fname: 'Matthew',
+                            lname: 'Adminstersmith',
+                            kname: 'Mr',
+                        },
+                        api_key: process.env.TEST_ADMIN_USER_API_KEY,
+                        _id: process.env.TEST_ADMIN_USER_ID,
                     }),
                 ),
             );
