@@ -16,8 +16,10 @@ exports.UserHasTwilioContext = function (userId) {
 };
 
 exports.MarkUserInitialized = function (userId) {
-    return Users.findOneAndUpdate(userId, {
+    return Users.findOneAndUpdate({ _id: userId }, {
         chat: { twilioInit: 'true' },
+    }, {
+        new: true,
     })
         .orFail(new Error())
         .catch((err) => {

@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const authTests = require('./auth_test');
 const channelTests = require('./create_chat_channel_test');
 const chatTests = require('./chat_test');
+const chatUserTests = require('./create_chat_user_test');
 const contactTests = require('./contact_test');
 const credentialControllerTests = require('./credentials_test');
 const db_util = require('../tools/db_util');
@@ -29,5 +30,13 @@ describe('API Tests', function () {
         describe('/contacts', contactTests.bind(this));
         describe('/chat', chatTests.bind(this));
         describe('/admin/chat/channel/create', channelTests.bind(this));
+    });
+    describe('User creation tests', function () {
+        beforeEach(function (done) {
+            // Before running these tests, mark user as un-init for twilio
+            db_util.markUsersAsUninitialized()
+                .then(() => done());
+        });
+        describe('/admin/chat/create', chatUserTests.bind(this));
     });
 });

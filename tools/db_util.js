@@ -70,6 +70,44 @@ User.schema.eachPath((path) => {
     }
 });
 
+module.exports.markUsersAsUninitialized = function () {
+    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
+        .then(users => users.map(user => user._id))
+        .then((user_ids) => {
+            const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
+                contacts: user_ids.filter(
+                    id => id !== user_id && Math.random() >= 0.5,
+                ),
+            }));
+
+            // Test Mentor
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[0], {
+                        chat: { twilioInit: 'true' },
+                        api_key: process.env.TEST_MENTOR_API_KEY,
+                        _id: process.env.TEST_MENTOR_USER_ID,
+                    }),
+                ),
+            );
+
+            // Test Mentee
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[1], {
+                        chat: { twilioInit: 'false' },
+                        api_key: process.env.TEST_MENTEE_API_KEY,
+                        _id: process.env.TEST_MENTEE_USER_ID,
+                    }),
+                ),
+            );
+            return Promise.all(ops);
+        })
+        .catch((err) => {
+            logger.error(err);
+        }));
+};
+
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
     return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(3))

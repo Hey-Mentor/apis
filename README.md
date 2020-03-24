@@ -123,7 +123,7 @@ Body:
 #### All of the following calls require a registered API access token, and the 
 #### calling user must be an admin
 
-__Endpoint__: `POST /admin/chat/create/?token=<token>`
+__Endpoint__: `POST /admin/chat/create?token=<token>`
 
 - Creates a user account with chat capability, from an existing Hey Mentor user
 
@@ -135,14 +135,13 @@ Body:
 ```
 
 
-__Endpoint__: `POST /admin/chat/channel/create/:userId?token=<token>`
+__Endpoint__: `POST /admin/chat/channel/create?token=<token>`
 
 - Creates a fully-initialized chat channel for communication between a set of users
 
 Body: 
 ```
 {
-	"channelName": "Channel name",
-	"inviteList": ["User Identity", ... , "5c15446bbf35ae4057111111"]
+	"user_ids": [<User Ids array -- array of strings>]
 }
 ```

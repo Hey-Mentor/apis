@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && NODE_ENV=test mocha --timeout 10000 'test/**/index.js' --exit",
+    "test": "npm run lint && NODE_ENV=test mocha --timeout 10000 --slow 2000 'test/**/index.js' --exit",
     "test:watch": "NODE_ENV=test nodemon  --exec 'mocha 'test/**/index.js' --exit'",
     "db:populate": "node ./scripts/populate_db.js",
     "start": "nodemon server.js"

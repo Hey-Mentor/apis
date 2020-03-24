@@ -52,14 +52,17 @@ exports.createChatChannel = async function (req, res) {
 };
 
 exports.createChatUser = async function (req, res) {
-    if (UserValidation.UserHasTwilioContext(req.body.user_id)) {
-        // If we already have Twilio context for this user, do not
-        // recreate. Recreating the context will cause the user to
-        // no longer see the chat messages they have already sent.
+    const userAlreadyInitialized = await UserValidation.UserHasTwilioContext(req.body.user_id);
+    if (userAlreadyInitialized) {
+        // TODO: We probably don't need this check, and in order to support
+        // multi-device login, we will probably need this check to not be here.
+        // Ensure that it's safe to create an existing user. Twilio creation
+        // should be idempotent.
         return res.sendStatus(409);
     }
 
     try {
+        // TODO: Update the device key to allow multi-device login
         const twilioClient = await Twilio.Client.create(
             TwilioService.TokenGenerator(req.user._id, 'init'),
         );
@@ -67,7 +70,7 @@ exports.createChatUser = async function (req, res) {
             return res.sendStatus(500);
         }
 
-        UserValidation.MarkUserInitialized(req.body.user_id);
+        await UserValidation.MarkUserInitialized(req.body.user_id);
     } catch (err) {
         return res.sendStatus(500);
     }
