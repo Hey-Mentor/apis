@@ -15,6 +15,7 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     channel_id: 'test',
+    chat: { twilioInit: 'false' },
     contacts: [],
     person: {
         fname: faker.name.firstName(),
@@ -94,6 +95,7 @@ module.exports.populateDB = function () {
                             lname: 'LeMentor',
                             kname: 'Ms',
                         },
+                        chat: { twilioInit: 'true' },
                         channel_id: process.env.TEST_CHANNEL_ID,
                         api_key: process.env.TEST_MENTOR_API_KEY,
                         _id: process.env.TEST_MENTOR_USER_ID,
@@ -115,6 +117,7 @@ module.exports.populateDB = function () {
                             lname: "D'Mentee",
                             kname: 'Mr',
                         },
+                        chat: { twilioInit: 'true' },
                         channel_id: process.env.TEST_CHANNEL_ID,
                         api_key: process.env.TEST_MENTEE_API_KEY,
                         _id: process.env.TEST_MENTEE_USER_ID,

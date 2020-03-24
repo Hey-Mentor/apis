@@ -76,6 +76,9 @@ const UserSchema = new Schema(
         sports: {
             type: Array,
         },
+        chat: {
+            twilioInit: { type: String },
+        },
         support: {
             type: [
                 {

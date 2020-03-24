@@ -27,36 +27,36 @@ exports.createChatChannel = async function (req, res) {
         return res.sendStatus(400);
     }
     const userIds = req.body.user_ids;
-    // const allValid = userIds.forEach(element => UserValidation.ValidateChatUser(element, true));
-    const allValid = true;
+    const allValid = userIds.every(UserValidation.UserHasTwilioContext);
 
     if (!allValid) {
+        // Some of the users that are being added to a new channel do not have
+        // twilio context created for them.
+        // TODO: Return an error letting the caller know they need to create the twilio
+        // user for each user in this request.
         return res.sendStatus(400);
     }
     try {
-        // const channel = TwilioService.createChannel(userIds);
-        // const update = { channel_id: channel.sid };
-        // userIds.map(user_id => User.updateOne({ id: user_id, channel_id: 'test' }, update));
-        // if (channel) {
-        //     return res.sendStatus(201);
-        // }
+        // TODO: Check if each user already has a channel created. If any user
+        // already has a channel, consider not creating a new one, and failing this op.
+        const channel = TwilioService.createChannel(userIds);
+        if (channel) {
+            const update = { channel_id: channel.sid };
+            userIds.map(user_id => User.updateOne({ id: user_id }, update));
+            return res.sendStatus(201);
+        }
         return res.sendStatus(200);
     } catch (err) {
         return res.sendStatus(500);
     }
-
-    // TODO: Check if each user already has a channel created, and skip if needed
-
-    // TODO: Create the actual channel in Twilio
-    // (Fredrik's code has this, but I took it out to move
-    //   away from the class-based approach)
-
-    // TODO: Add the appropriate members to the channel
 };
 
 exports.createChatUser = async function (req, res) {
-    if (!UserValidation.ValidateChatUser(req.body.user_id, false)) {
-        return res.sendStatus(400);
+    if (UserValidation.UserHasTwilioContext(req.body.user_id)) {
+        // If we already have Twilio context for this user, do not
+        // recreate. Recreating the context will cause the user to
+        // no longer see the chat messages they have already sent.
+        return res.sendStatus(409);
     }
 
     try {
@@ -67,7 +67,7 @@ exports.createChatUser = async function (req, res) {
             return res.sendStatus(500);
         }
 
-        UserValidation.InitChatUser(req.body.user_id);
+        UserValidation.MarkUserInitialized(req.body.user_id);
     } catch (err) {
         return res.sendStatus(500);
     }

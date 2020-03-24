@@ -3,12 +3,11 @@ const mongoose = require('mongoose');
 const Users = mongoose.model('User');
 const { logger } = require('../logging/logger');
 
-exports.ValidateChatUser = function (userId, isInitialized) {
+exports.UserHasTwilioContext = function (userId) {
     return Users.findById(userId, { api_key: 0 })
         .orFail(new Error())
         .then(
-            user => (user.user_type === 'mentor' || user.user_type === 'mentee')
-        && user.chat.twilioInit === isInitialized,
+            user => user.chat.twilioInit === 'true',
         )
         .catch((err) => {
             logger.error(err.toString());
@@ -16,9 +15,9 @@ exports.ValidateChatUser = function (userId, isInitialized) {
         });
 };
 
-exports.InitChatUser = function (userId) {
+exports.MarkUserInitialized = function (userId) {
     return Users.findOneAndUpdate(userId, {
-        chat: { twilioInit: true },
+        chat: { twilioInit: 'true' },
     })
         .orFail(new Error())
         .catch((err) => {
