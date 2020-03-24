@@ -2,6 +2,13 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
+const ContactSchema = new Schema(
+    {
+        user_id: { type: String },
+        channel_id: { type: String },
+    },
+);
+
 const UserSchema = new Schema(
     {
         user_type: {
@@ -32,8 +39,7 @@ const UserSchema = new Schema(
         contacts: {
             type: [
                 {
-                    type: Schema.Types.ObjectId,
-                    ref: 'User',
+                    type: ContactSchema,
                 },
             ],
             select: false,
@@ -65,10 +71,6 @@ const UserSchema = new Schema(
         },
         gen_interest: {
             type: String,
-        },
-        channel_id: {
-            type: String,
-            required: false,
         },
         spec_interests: {
             type: Array,

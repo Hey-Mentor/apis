@@ -14,9 +14,8 @@ const fake_users = new Array(10).fill().map(() => ({
     facebook_id: faker.random.number(),
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
-    channel_id: 'test',
-    chat: { twilioInit: 'false' },
     contacts: [],
+    chat: { twilioInit: 'false' },
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
@@ -66,47 +65,9 @@ User.schema.eachPath((path) => {
             prop = prop[key];
         });
     } else if (!user[path]) {
-        throw new Error(`Mock data lacking schema property hello : ${path}`);
+        throw new Error(`Mock data lacking schema property: ${path}`);
     }
 });
-
-module.exports.markUsersAsUninitialized = function () {
-    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
-        .then(users => users.map(user => user._id))
-        .then((user_ids) => {
-            const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
-                contacts: user_ids.filter(
-                    id => id !== user_id && Math.random() >= 0.5,
-                ),
-            }));
-
-            // Test Mentor
-            ops.push(
-                User.create(
-                    Object.assign(fake_users[0], {
-                        chat: { twilioInit: 'true' },
-                        api_key: process.env.TEST_MENTOR_API_KEY,
-                        _id: process.env.TEST_MENTOR_USER_ID,
-                    }),
-                ),
-            );
-
-            // Test Mentee
-            ops.push(
-                User.create(
-                    Object.assign(fake_users[1], {
-                        chat: { twilioInit: 'false' },
-                        api_key: process.env.TEST_MENTEE_API_KEY,
-                        _id: process.env.TEST_MENTEE_USER_ID,
-                    }),
-                ),
-            );
-            return Promise.all(ops);
-        })
-        .catch((err) => {
-            logger.error(err);
-        }));
-};
 
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
@@ -115,8 +76,8 @@ module.exports.populateDB = function () {
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
                 contacts: user_ids.filter(
-                    id => id !== user_id && Math.random() >= 0.5,
-                ),
+                    id => id !== user_id && Math.random() >= 0.2,
+                ).map(user => ({ user_id: user, channel_id: process.env.TEST_CHANNEL_ID })),
             }));
 
             // Test Mentor
@@ -125,8 +86,18 @@ module.exports.populateDB = function () {
                     Object.assign(fake_users[0], {
                         facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
                         contacts: user_ids
-                            .map(user => user._id)
-                            .concat([process.env.TEST_MENTEE_USER_ID]),
+                            .map(
+                                user => ({
+                                    user_id: user._id,
+                                    channel_id: process.env.TEST_CHANNEL_ID,
+                                }),
+                            )
+                            .concat(
+                                [{
+                                    user_id: process.env.TEST_MENTEE_USER_ID,
+                                    channel_id: process.env.TEST_CHANNEL_ID,
+                                }],
+                            ),
                         user_type: 'mentor',
                         person: {
                             fname: 'Nancy',
@@ -134,7 +105,6 @@ module.exports.populateDB = function () {
                             kname: 'Ms',
                         },
                         chat: { twilioInit: 'true' },
-                        channel_id: process.env.TEST_CHANNEL_ID,
                         api_key: process.env.TEST_MENTOR_API_KEY,
                         _id: process.env.TEST_MENTOR_USER_ID,
                     }),
@@ -147,8 +117,18 @@ module.exports.populateDB = function () {
                     Object.assign(fake_users[1], {
                         facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
                         contacts: user_ids
-                            .map(user => user._id)
-                            .concat([process.env.TEST_MENTOR_USER_ID]),
+                            .map(
+                                user => ({
+                                    user_id: user._id,
+                                    channel_id: process.env.TEST_CHANNEL_ID,
+                                }),
+                            )
+                            .concat(
+                                [{
+                                    user_id: process.env.TEST_MENTOR_USER_ID,
+                                    channel_id: process.env.TEST_CHANNEL_ID,
+                                }],
+                            ),
                         user_type: 'mentee',
                         person: {
                             fname: 'Jackson',
@@ -156,7 +136,6 @@ module.exports.populateDB = function () {
                             kname: 'Mr',
                         },
                         chat: { twilioInit: 'true' },
-                        channel_id: process.env.TEST_CHANNEL_ID,
                         api_key: process.env.TEST_MENTEE_API_KEY,
                         _id: process.env.TEST_MENTEE_USER_ID,
                     }),

@@ -30,13 +30,6 @@ describe('API Tests', function () {
         describe('/contacts', contactTests.bind(this));
         describe('/chat', chatTests.bind(this));
         describe('/admin/chat/channel/create', channelTests.bind(this));
-    });
-    describe('User creation tests', function () {
-        beforeEach(function (done) {
-            // Before running these tests, mark user as un-init for twilio
-            db_util.markUsersAsUninitialized()
-                .then(() => done());
-        });
         describe('/admin/chat/create', chatUserTests.bind(this));
     });
 });
