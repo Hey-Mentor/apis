@@ -44,8 +44,8 @@ passport.use(new GoogleTokenStrategy({
 
 */
 
-const register = function ({ query, res }) {
-    return User.findOne(query, REGISTER_SCHEMA).orFail(new Error())
+exports.facebookRegister = function (req, res) {
+    return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA).orFail(new Error())
         .then((user) => {
             const api_key = uuid().replace(/-/g, '');
             return User.findOneAndUpdate({ _id: user._id }, { api_key }, {
@@ -65,8 +65,8 @@ const register = function ({ query, res }) {
         });
 };
 
-const login = function ({ query, res }) {
-    return User.findOne(query, REGISTER_SCHEMA).orFail(new Error())
+exports.facebookLogin = function (req, res) {
+    return User.findOne({ facebook_id: req.user.id }, REGISTER_SCHEMA).orFail(new Error())
         .then((user) => {
             if (!user.api_key) {
                 return res.status(400).json({ status: 'Must register first' });
@@ -79,14 +79,6 @@ const login = function ({ query, res }) {
         });
 };
 
-exports.facebookRegister = function (req, res) {
-    return register({ query: { facebook_id: req.user.id }, res });
-};
-
-exports.facebookLogin = function (req, res) {
-    return login({ query: { facebook_id: req.user.id }, res });
-};
-
 exports.googleRegister = function (req, res) {
-    return register({ query: { google_id: req.user.id }, res });
+    return res.sendStatus(500);
 };

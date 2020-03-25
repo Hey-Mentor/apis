@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint && NODE_ENV=test mocha 'test/**/index.js' --exit",
+    "test": "npm run lint && NODE_ENV=test mocha --timeout 10000 --slow 2000 'test/**/index.js' --exit",
     "test:watch": "NODE_ENV=test nodemon  --exec 'mocha 'test/**/index.js' --exit'",
     "db:populate": "node ./scripts/populate_db.js",
     "start": "nodemon server.js"
@@ -14,13 +14,14 @@
   "devDependencies": {
     "chai": "^4.2.0",
     "chai-http": "^4.2.0",
-    "eslint": "^5.10.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-config-google": "^0.11.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-sort-requires": "^2.1.0",
+    "minimist": ">=1.2.2",
     "mocha": "^5.2.0",
-    "nodemon": "^1.18.3"
+    "nodemon": "^2.0.2"
   },
   "dependencies": {
     "assign-deep": "^1.0.1",
@@ -38,10 +39,10 @@
     "passport": "^0.4.0",
     "passport-facebook-token": "^3.3.0",
     "passport-google-token": "^0.1.2",
-    "pm2": "^3.5.1",
+    "pm2": "^4.2.3",
     "sendbird": "^3.0.90",
     "set-value": "^3.0.1",
-    "twilio": "^3.27.1",
+    "twilio": "^3.39.4",
     "twilio-chat": "^3.3.2",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"

@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 require('dotenv').config();
 const faker = require('faker');
 const mongoose = require('mongoose');
@@ -15,6 +16,7 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     contacts: [],
+    chat: { twilioInit: 'false', channels: [] },
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
@@ -34,13 +36,24 @@ const fake_users = new Array(10).fill().map(() => ({
     gen_interest: faker.lorem.sentences(),
     spec_interests: new Array(3).fill().map(() => faker.lorem.words(1)),
     sports: new Array(3).fill().map(() => faker.lorem.words(1)),
-    support: new Array(3).fill().map(() => faker.random.arrayElement(['college_applications', 'scholarships', 'financial_aid', 'college_search', 'career_advice', 'exam_preparation'])),
+    support: new Array(3)
+        .fill()
+        .map(() => faker.random.arrayElement([
+            'college_applications',
+            'scholarships',
+            'financial_aid',
+            'college_search',
+            'career_advice',
+            'exam_preparation',
+        ])),
 }));
 
 // Check fake_users has a value for each schema attribute
 User.schema.eachPath((path) => {
     // Ignore mongoose attributes
-    if (path[0] === '_') { return; }
+    if (path[0] === '_') {
+        return;
+    }
 
     const user = fake_users[0];
     if (path.includes('.')) {
@@ -59,7 +72,7 @@ User.schema.eachPath((path) => {
 
 // Empty the DB, then add users and randomly populate their contacts with other users
 module.exports.populateDB = function () {
-    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(2))
+    return User.deleteMany({}).then(() => User.insertMany(fake_users.slice(3))
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
@@ -67,32 +80,58 @@ module.exports.populateDB = function () {
             }));
 
             // Test Mentor
-            ops.push(User.create(Object.assign(fake_users[0], {
-                facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
-                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTEE_USER_ID]),
-                user_type: 'mentor',
-                person: {
-                    fname: 'Nancy',
-                    lname: 'LeMentor',
-                    kname: 'Ms',
-                },
-                api_key: process.env.TEST_MENTOR_API_KEY,
-                _id: process.env.TEST_MENTOR_USER_ID,
-            })));
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[0], {
+                        facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
+                        contacts: [process.env.TEST_MENTEE_USER_ID],
+                        user_type: 'mentor',
+                        person: {
+                            fname: 'Nancy',
+                            lname: 'LeMentor',
+                            kname: 'Ms',
+                        },
+                        chat: { twilioInit: 'true', channels: [{ contact: process.env.TEST_MENTEE_USER_ID, channel: process.env.TEST_CHANNEL_ID }] },
+                        api_key: process.env.TEST_MENTOR_API_KEY,
+                        _id: process.env.TEST_MENTOR_USER_ID,
+                    }),
+                ),
+            );
 
             // Test Mentee
-            ops.push(User.create(Object.assign(fake_users[1], {
-                facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
-                contacts: user_ids.map(user => user._id).concat([process.env.TEST_MENTOR_USER_ID]),
-                user_type: 'mentee',
-                person: {
-                    fname: 'Jackson',
-                    lname: "D'Mentee",
-                    kname: 'Mr',
-                },
-                api_key: process.env.TEST_MENTEE_API_KEY,
-                _id: process.env.TEST_MENTEE_USER_ID,
-            })));
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[1], {
+                        facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
+                        contacts: [process.env.TEST_MENTOR_USER_ID],
+                        user_type: 'mentee',
+                        person: {
+                            fname: 'Jackson',
+                            lname: "D'Mentee",
+                            kname: 'Mr',
+                        },
+                        chat: { twilioInit: 'true', channels: [{ contact: process.env.TEST_MENTOR_USER_ID, channel: process.env.TEST_CHANNEL_ID }] },
+                        api_key: process.env.TEST_MENTEE_API_KEY,
+                        _id: process.env.TEST_MENTEE_USER_ID,
+                    }),
+                ),
+            );
+
+            // Test Admin
+            ops.push(
+                User.create(
+                    Object.assign(fake_users[2], {
+                        user_type: 'admin',
+                        person: {
+                            fname: 'Matthew',
+                            lname: 'Adminstersmith',
+                            kname: 'Mr',
+                        },
+                        api_key: process.env.TEST_ADMIN_USER_API_KEY,
+                        _id: process.env.TEST_ADMIN_USER_ID,
+                    }),
+                ),
+            );
 
             return Promise.all(ops);
         })

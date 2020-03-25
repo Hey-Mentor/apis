@@ -25,7 +25,7 @@ exports.updateProfile = function (req, res) {
 };
 
 exports.getContacts = function (req, res) {
-    Users.findById(req.user._id, { contacts: 1 }).orFail(new Error())
+    Users.findById(req.user._id, 'contacts').orFail(new Error())
         .populate('contacts')
         .then(contacts => res.json(contacts))
         .catch((err) => {
