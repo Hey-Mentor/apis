@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 require('dotenv').config();
 const faker = require('faker');
 const mongoose = require('mongoose');
@@ -15,7 +16,7 @@ const fake_users = new Array(10).fill().map(() => ({
     google_id: faker.random.alphaNumeric(20),
     api_key: uuid().replace(/-/g, ''),
     contacts: [],
-    chat: { twilioInit: 'false' },
+    chat: { twilioInit: 'false', channels: [] },
     person: {
         fname: faker.name.firstName(),
         lname: faker.name.lastName(),
@@ -75,9 +76,7 @@ module.exports.populateDB = function () {
         .then(users => users.map(user => user._id))
         .then((user_ids) => {
             const ops = user_ids.map(user_id => User.findByIdAndUpdate(user_id, {
-                contacts: user_ids.filter(
-                    id => id !== user_id && Math.random() >= 0.2,
-                ).map(user => ({ user_id: user, channel_id: process.env.TEST_CHANNEL_ID })),
+                contacts: user_ids.filter(id => id !== user_id && Math.random() >= 0.5),
             }));
 
             // Test Mentor
@@ -85,26 +84,14 @@ module.exports.populateDB = function () {
                 User.create(
                     Object.assign(fake_users[0], {
                         facebook_id: process.env.TEST_MENTOR_FACEBOOK_ID,
-                        contacts: user_ids
-                            .map(
-                                user => ({
-                                    user_id: user._id,
-                                    channel_id: process.env.TEST_CHANNEL_ID,
-                                }),
-                            )
-                            .concat(
-                                [{
-                                    user_id: process.env.TEST_MENTEE_USER_ID,
-                                    channel_id: process.env.TEST_CHANNEL_ID,
-                                }],
-                            ),
+                        contacts: [process.env.TEST_MENTEE_USER_ID],
                         user_type: 'mentor',
                         person: {
                             fname: 'Nancy',
                             lname: 'LeMentor',
                             kname: 'Ms',
                         },
-                        chat: { twilioInit: 'true' },
+                        chat: { twilioInit: 'true', channels: [{ contact: process.env.TEST_MENTEE_USER_ID, channel: process.env.TEST_CHANNEL_ID }] },
                         api_key: process.env.TEST_MENTOR_API_KEY,
                         _id: process.env.TEST_MENTOR_USER_ID,
                     }),
@@ -116,26 +103,14 @@ module.exports.populateDB = function () {
                 User.create(
                     Object.assign(fake_users[1], {
                         facebook_id: process.env.TEST_MENTEE_FACEBOOK_ID,
-                        contacts: user_ids
-                            .map(
-                                user => ({
-                                    user_id: user._id,
-                                    channel_id: process.env.TEST_CHANNEL_ID,
-                                }),
-                            )
-                            .concat(
-                                [{
-                                    user_id: process.env.TEST_MENTOR_USER_ID,
-                                    channel_id: process.env.TEST_CHANNEL_ID,
-                                }],
-                            ),
+                        contacts: [process.env.TEST_MENTOR_USER_ID],
                         user_type: 'mentee',
                         person: {
                             fname: 'Jackson',
                             lname: "D'Mentee",
                             kname: 'Mr',
                         },
-                        chat: { twilioInit: 'true' },
+                        chat: { twilioInit: 'true', channels: [{ contact: process.env.TEST_MENTOR_USER_ID, channel: process.env.TEST_CHANNEL_ID }] },
                         api_key: process.env.TEST_MENTEE_API_KEY,
                         _id: process.env.TEST_MENTEE_USER_ID,
                     }),

@@ -2,13 +2,6 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const ContactSchema = new Schema(
-    {
-        user_id: { type: String },
-        channel_id: { type: String },
-    },
-);
-
 const UserSchema = new Schema(
     {
         user_type: {
@@ -37,13 +30,21 @@ const UserSchema = new Schema(
             select: false,
         },
         contacts: {
-            type: [
-                {
-                    type: ContactSchema,
-                },
-            ],
+            type: [{
+                type: Schema.Types.ObjectId,
+                ref: 'User',
+            }],
             select: false,
         },
+        chat: {
+            twilioInit: { type: String },
+            channels: {
+                type: Array,
+                required: false,
+                select: true,
+            },
+        },
+        /* Profile Data below */
         person: {
             fname: {
                 type: String,
@@ -78,9 +79,6 @@ const UserSchema = new Schema(
         sports: {
             type: Array,
         },
-        chat: {
-            twilioInit: { type: String },
-        },
         support: {
             type: [
                 {
@@ -98,7 +96,7 @@ const UserSchema = new Schema(
         },
     },
     {
-    // NOTE: The 'collection' field here must match the "Collection" on the backend
+        // NOTE: The 'collection' field here must match the "Collection" on the backend
         collection: 'Users',
     },
 );

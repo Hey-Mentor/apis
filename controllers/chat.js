@@ -41,9 +41,17 @@ exports.createChatChannel = async function (req, res) {
         // already has a channel, consider not creating a new one, and failing this op.
         const channel = TwilioService.createChannel(userIds);
         if (channel) {
+            // TODO: We add the channels to the user document, which we reference
+            // in the contacts list. This means that a user can see all of the contacts
+            // that their contacts have, which we don't want.
             const updates = userIds.map(
-                user => ({ $push: { contacts: { user_id: user, channel_id: channel.sid } } }),
+                user_id => (
+                    { chat: { $push: { channels: { contact: user_id, channel: channel.sid } } } }
+                ),
             );
+
+            // TODO: The 'create channel' API now has a side-effect that it updates the
+            // user object by adding to the contacts. This is not desireable.
             userIds.map(
                 user_id => updates.filter(id => id !== user_id).forEach(
                     update => User.updateOne({ id: user_id }, update),

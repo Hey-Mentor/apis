@@ -38,7 +38,7 @@ module.exports = function () {
 
         const res_mentee = await request.get(`/contacts/${process.env.TEST_MENTEE_USER_ID}?token=${process.env.TEST_MENTEE_API_KEY}`);
         const res_mentor = await request.get(`/contacts/${process.env.TEST_MENTOR_USER_ID}?token=${process.env.TEST_MENTOR_API_KEY}`);
-        assert.exists(res_mentee.body.contacts[0].channel_id);
-        assert.exists(res_mentor.body.contacts[0].channel_id);
+        assert.exists(res_mentee.body.contacts[0].chat.channels);
+        assert.exists(res_mentor.body.contacts[0].chat.channels);
     });
 };

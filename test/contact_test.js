@@ -16,9 +16,11 @@ module.exports = function () {
         assert.equal(res.status, 200);
         assert.typeOf(res.body, 'object');
         assert.typeOf(res.body.contacts, 'array');
+        assert.notExists(res.body.contacts[0].api_key);
         assert.typeOf(res.body._id, 'string');
         res.body.contacts.forEach((contact) => {
-            assert.hasAllKeys(contact, ['_id', 'user_id', 'channel_id'], contact);
+            assert.hasAllKeys(contact, ['__v', '_id', 'person', 'demo', 'gen_interest', 'spec_interests', 'user_type',
+                'sports', 'school', 'support', 'facebook_id', 'chat'], contact);
         });
     });
 };
