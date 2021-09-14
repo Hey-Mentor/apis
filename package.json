@@ -41,7 +41,7 @@
     "passport-google-token": "^0.1.2",
     "pm2": "^4.2.3",
     "sendbird": "^3.0.90",
-    "set-value": "^3.0.1",
+    "set-value": "^4.0.1",
     "twilio": "^3.39.4",
     "twilio-chat": "^3.3.2",
     "uuid": "^3.3.2",
