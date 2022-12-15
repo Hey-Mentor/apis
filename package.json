@@ -43,7 +43,7 @@
     "sendbird": "^3.0.90",
     "set-value": "^3.0.1",
     "twilio": "^3.39.4",
-    "twilio-chat": "^3.3.2",
+    "twilio-chat": "^6.0.0",
     "uuid": "^3.3.2",
     "winston": "^3.1.0"
   }
